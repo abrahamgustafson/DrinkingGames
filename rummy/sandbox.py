@@ -6,10 +6,11 @@ ToDo:
  - 
 
 Analysis ideas
- [ ] See which rounds are the bloodiest
+ [x] See which rounds are the bloodiest
  [ ] ^ But filtered by player count
  [ ] Probability of winning a game over time
  [ ] Who has the best relative end score (average points +/- relative to opponents)
+ [ ] Most probable round to get natural . (hunch, more likely early)
 """
 
 import argparse
