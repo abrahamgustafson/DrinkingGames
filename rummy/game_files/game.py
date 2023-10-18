@@ -172,4 +172,4 @@ if __name__ == "__main__":
 
     # load_all_games()
     # run_script(**vars(args))
-    run_script()
+    # run_script()

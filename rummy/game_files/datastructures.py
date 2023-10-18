@@ -2,6 +2,7 @@
 
 import random
 from enum import Enum
+from itertools import permutations
 
 
 CARD_POINT_MAP = {
@@ -73,6 +74,9 @@ class Card:
         if isinstance(other, Card):
             return self.suit == other.suit and self.value == other.value
         return False
+    
+    def __lt__(self, other):
+        return self.value < other.value
     
     def __sub__(self, other):
         return self.value - other.value
@@ -152,7 +156,22 @@ class Hand:
         return s
 
     def sort(self):
+        # TODO: Might have to make a secondary sort on the suit... 
+        # Also I shouldn't have done reverse...
         self.cards.sort(key=lambda x: x.value, reverse=True)
+
+    def sorted_cards_minus_wilds(self, round):
+        """
+        Return a temporary list of all the cards ignoring wilds.
+        """
+        # Should make sure we do insertion sort or something to avoid this.
+        self.sort()
+        cards = []
+        for card in self.cards:
+            if not is_wild(card, round):
+                cards.append(card)
+
+        return cards
     
 
 class DiscardPile:
@@ -173,6 +192,12 @@ class DiscardPile:
     
     def peek(self):
         return self.cards[len(self.cards) - 1]
+
+    
+def get_card_score(card, round):
+    if is_wild(card, round):
+        return 0
+    return CARD_POINT_MAP[CARD_TEXT_MAP[card.value]]
     
 
 def is_wild(card, round):
@@ -233,8 +258,96 @@ def is_valid_group(card_list, round):
         running_wild_counter = 0
 
     return True
-
     
+def get_all_sets(hand, round):
+    """
+    if input is [3,3,4], return [[3,3],[4]]
+    Sets are duplicates of the same card (excluding wilds)
+    """
+    def make_set_group(c, i):
+        g = []
+        while i < len(c) and c[i].value == c[i - 1].value:
+            g.append(c[i - 1])
+            i += 1
+        g.append(c[i - 1])
+        return i, g
+    
+    index = 1
+    groups = []
+    cards = hand.sorted_cards_minus_wilds(round)
+    # Doing this because the inner loop has a break out, and that's how we add the last card.
+    while index <= len(cards):
+        index, group = make_set_group(cards, index)
+        groups.append(group)
+        index += 1
+
+    return groups
+
+
+def get_all_runs(hand, round):
+    """
+    if input is [3h,3d,4h], return [[3h,4h],[3d]]
+    Runs are incrementing values of the same suit (excluding wilds)
+    """
+    def make_run(c):
+        g = []
+        current_card = c[0]
+        g.append(current_card)
+
+        i = 1
+        while i < len(c):
+            # If it's the same card, skip 
+            if current_card.value == c[i].value:
+                i += 1
+                continue
+            
+            # If the card is in a run, add it.
+            if current_card.suit == c[i].suit and current_card.value == c[i].value + 1:
+                g.append(c[i])
+                current_card = c[i]
+                i += 1
+                continue
+
+            # Early break clause, if the value is two higher...
+            if current_card.value < c[i].value + 1:
+                break
+
+            # Base case? We just increment and continue?
+            i += 1
+        return g
+    
+    groups = []
+    cards = hand.sorted_cards_minus_wilds(round)
+    
+    # Need a copy of <cards left> and we iterate through with the first each time, 
+    # Try to find something that follows this card, then follows the next card, then add them
+    # as a contiguous set -- removing them from the cards...
+    while len(cards) > 0:
+        group = make_run(cards)
+        groups.append(group)
+
+        # Brute force, should make this more efficient.
+        for c in group:
+            cards.remove(c)
+
+    return groups
+
+
+def get_natural_outage_possibilities(round):
+    assert round > 2 and round < 14
+
+    def find_combinations(target, min_group):
+        if target == 0:
+            return [[]]
+        if target < 0:
+            return []
+        combinations = []
+        for i in range(min_group, target + 1):
+            sub_combinations = find_combinations(target - i, i)
+            combinations.extend([[i] + combo for combo in sub_combinations])
+        return combinations
+
+    return find_combinations(round, 3)
     
 
 def check_go_out(hand, existing_groups=None):
@@ -251,7 +364,141 @@ def check_go_out(hand, existing_groups=None):
     """
     if not existing_groups:
         existing_groups = list()
+    assert len(hand.cards) > 2 and len(hand.cards) < 14
+    round = len(hand.cards) - 1
+    hand.sort()
 
-    pass
+    non_wild_cards = hand.sorted_cards_minus_wilds(round)
+    num_wilds = len(hand.cards) - len(non_wild_cards)
+    runs = get_all_runs(hand, round)
+    sets = get_all_sets(hand, round)
+    combined_groups = runs + sets
+
+    # if runs are [a,b,c] and sets are [1,2], iterate assuming something over 3 is a set.
+    group_permutation_order = list(permutations(range(len(runs) + len(sets))))
+
+    # Other strategy:
+    # Loop through each <runs> and <sets> with a wild count. Try to string them together in every
+    # possible combination to get the lowest sum value.
+    # Could bias to start with higher combinations of cards and all that, or could brute force..
+    # Really we should consider everything, so may as well brute force.
+
+    
+
+    for wild_count in range(0, num_wilds):
+        print("solve with a wild")
+        # Solve with a wild.
+
+    # Solve without wilds
+
+    """
+    x: [1,2]
+    y: [a,b,c]
+
+    for iy in range(len(y))
+        for ix in range(len(x))
+            loop through each combination, starting with x[0] going x+ first, then y+,
+            Then do y[0] first, going x+ then y+
+
+    outcome list:
+     - [1,2,a,b,c]
+     - [1,a,b,c,2]...
+
+     No, just get a all unique combinations of x and y and run them...
+    
+     -- 
+     Do a greedy alg to use wild count to chain together?
+    """
+
+    # list(tuple(scenario_selection_group, discard, other_cards, score))
+    outage_scenarios = []
+
+    for order in group_permutation_order:
+
+        group_index = 0
+        scenario_selection_groups = []
+        scenario_score = 0
+        hand_copy = hand.cards.copy()
+
+        # a "group", aka combined_groups[order[group_index]] will be a list of dards that are either a run, or a set..
+        # EG, [3h,4h,5h] or [3h,3d,3h]
+        while group_index < len(order):
+            # Get the group, regardless of type
+            group = combined_groups[order[group_index]]
+            is_run_group = bool(order[group_index] < len(runs))
+
+            # Base base case... If the hand is empty, we have removed all the cards!
+            if len(hand_copy) < 1:
+                break
+
+            # Base case, no wilds, continue if length doesn't fit.
+            if len(group) < 3:  # Should probably do something other than hardcoded 3...
+                group_index += 1
+                continue
+
+            # If here, implicitly it is 3 in a row. 
+            # Ensure all cards here are available, otherwise skip to the next
+            
+            # We will try to remove before we actually remove... If we can't this group doesn't work
+            temp_hand_copy = hand_copy.copy()
+            all_good = True
+            for card in group:
+                if card not in temp_hand_copy:
+                    all_good = False
+                    break
+                temp_hand_copy.remove(card)
+            
+            if not all_good:
+                group_index +=1
+                continue
+
+            # We are good, add this as a group, and remove the cards from play
+            scenario_selection_groups.append(group)
+            hand_copy = temp_hand_copy
+            group_index +=1
+
+        # We have effectively consumed all the cards in this order, or we have gone out.
+        # Add up the score and record this outcome.
+        # Implicitly anything in a group is zero points, just have to count the extra cards
+        
+        hand_copy.sort()  # last card should be highest?
+        discard = hand_copy[len(hand_copy) - 1]
+
+        # State invalidation.
+        assert not is_wild(discard, round)
+
+        hand_copy.remove(discard)
+        for card in hand_copy:
+            scenario_score += get_card_score(card, round)
+
+        outage_scenarios.append((scenario_selection_groups, discard, hand_copy, scenario_score))
+
+    # On looking closer... I think I can keep this same model, I just need to add all wild cards to the combinations...
+
+    # Sort by the lowest value...
+    outage_scenarios.sort(key = lambda x: x[3]) 
+    print(" -- Best scenario, given hand: ")
+    for card in non_wild_cards:
+        print(card)
+    print("-- Is:")
+    for group in outage_scenarios[0][0]:
+        print(" - Group: ")
+        for card in group:
+            print(card)
+    print(" - Discard: {}".format(outage_scenarios[0][1]))
+    print(" - Score: {}".format(outage_scenarios[0][3]))
 
 
+    # One strategy:
+    #  - Create all possible card combinations, based on sorted card order...
+    #    EG: [0,1,2] for a hand of 3's, or for 6's: [[0,1,2],[3,4,5]], [[0,2,5],[2,3,4]]
+    #  - Then loop throughand pick the one that has the lowest score.
+    #     -- Note that jokers screw up the sort, so have to do any order... that could get too big
+    
+
+    # First priority should be to go out naturally, optimize for that..
+    # natural_outage_possibilities = get_natural_outage_possibilities(round)
+
+    # Card discard strategy, return the highest card with the least combinations
+
+    # Add a <play off others> mechanic after.
