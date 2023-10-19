@@ -1,9 +1,14 @@
 """Data structures"""
 
+import copy
+import logging
 import random
+
 from enum import Enum
 from itertools import permutations
 
+
+logging.basicConfig(level=logging.DEBUG)
 
 CARD_POINT_MAP = {
     'A': 1,
@@ -82,6 +87,9 @@ class Card:
         return self.value - other.value
     
     def __str__(self):
+        return "[{}{}]".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value])
+    
+    def __repr__(self):
         return "[{}{}]".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value])
     
     def same_suit(self, other):
@@ -173,6 +181,15 @@ class Hand:
 
         return cards
     
+    def wilds(self, round):
+        # Should make sure we do insertion sort or something to avoid this.
+        wilds = []
+        for card in self.cards:
+            if is_wild(card, round):
+                wilds.append(card)
+
+        return wilds
+
 
 class DiscardPile:
     cards = None
@@ -262,7 +279,10 @@ def is_valid_group(card_list, round):
 def get_all_sets(hand, round):
     """
     if input is [3,3,4], return [[3,3],[4]]
-    Sets are duplicates of the same card (excluding wilds)
+
+    if input is [1,1,2,4], return [[1,1], [1,1,4], [2], [2,4]]
+
+    Sets are duplicates of the same card (excluding wilds).
     """
     def make_set_group(c, i):
         g = []
@@ -281,6 +301,26 @@ def get_all_sets(hand, round):
         groups.append(group)
         index += 1
 
+    # Go back and add wilds.. 
+    # [[1,1], [2]]
+    # [[1,1], [2], [1,1,4], [2,4]]
+    # [[1,1], [2], [1,1,4], [2,4], [1,1,4,4], [2,4,4]]
+
+    # TODO: If i'm incorporating wilds here, I really shouldn't do groups that are less than 3 in size...
+    # If I play on 
+  
+    wilds = hand.wilds(round)
+    non_wilds_group_copy = copy.deepcopy(groups)
+
+    for idx, wild in enumerate(wilds):
+        groups_copy = copy.deepcopy(non_wilds_group_copy)
+        for group in groups_copy:
+            group.append(wild)
+            # Need to add additional wilds as combinations. Don't need permutation though.
+            for i in range(0, idx):
+                group.append(wilds[i])
+            groups.append(group)
+
     return groups
 
 
@@ -289,6 +329,10 @@ def get_all_runs(hand, round):
     if input is [3h,3d,4h], return [[3h,4h],[3d]]
     Runs are incrementing values of the same suit (excluding wilds)
     """
+
+    # TODO: I gotta fix this actually... this should return differently.
+    # If it is [3h, 4h, 5h, 6h], options should be:
+    # [3h, 4h, 5h], [4h, 5h, 6h], [3h, 4h, 5h, 6h].. 
     def make_run(c):
         g = []
         current_card = c[0]
@@ -329,6 +373,16 @@ def get_all_runs(hand, round):
         # Brute force, should make this more efficient.
         for c in group:
             cards.remove(c)
+
+    # TODO: I gotta figure out how to do wilds as well
+    # If it is [4h, 5h, 7h, 8h, W], options should be:
+    # [W, 4h, 5h], [4h, 5h, W], [W, 7h, 8h], [7h, 8h, W]
+    # [5h, W, 7h]
+    # [4h, 5h, W, 7h], [5h, W, 7h, 8h]
+    # [4h, 5h, W, 7h, 8h]
+
+    wilds = hand.wilds(round)
+    non_wilds_group_copy = copy.deepcopy(groups)
 
     return groups
 
@@ -413,6 +467,9 @@ def check_go_out(hand, existing_groups=None):
     # list(tuple(scenario_selection_group, discard, other_cards, score))
     outage_scenarios = []
 
+    
+    logging.debug('group permutation order length: {}'.format(len(group_permutation_order)))
+    total_cycles = 0
     for order in group_permutation_order:
 
         group_index = 0
@@ -423,6 +480,8 @@ def check_go_out(hand, existing_groups=None):
         # a "group", aka combined_groups[order[group_index]] will be a list of dards that are either a run, or a set..
         # EG, [3h,4h,5h] or [3h,3d,3h]
         while group_index < len(order):
+            total_cycles += 1
+
             # Get the group, regardless of type
             group = combined_groups[order[group_index]]
             is_run_group = bool(order[group_index] < len(runs))
@@ -474,6 +533,7 @@ def check_go_out(hand, existing_groups=None):
         outage_scenarios.append((scenario_selection_groups, discard, hand_copy, scenario_score))
 
     # On looking closer... I think I can keep this same model, I just need to add all wild cards to the combinations...
+    logging.debug("Total cycles: {}".format(total_cycles))
 
     # Sort by the lowest value...
     outage_scenarios.sort(key = lambda x: x[3]) 

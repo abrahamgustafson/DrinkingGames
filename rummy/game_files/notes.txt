@@ -1,0 +1,8 @@
+DEBUG:root:group permutation order length: 362880
+DEBUG:root:Total cycles: 3265920
+
+DEBUG:root:group permutation order length: 3628800
+DEBUG:root:Total cycles: 36288000
+
+DEBUG:root:group permutation order length: 362880
+DEBUG:root:Total cycles: 3265920

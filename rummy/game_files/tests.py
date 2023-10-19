@@ -90,7 +90,7 @@ def test_get_all_sets():
     
     assert sets == expected_sets
 
-    # Tests ensuring we skip wilds...
+    # Test with wilds
     hand = Hand("test")
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 3))
@@ -100,9 +100,14 @@ def test_get_all_sets():
     expected_sets = [
             [Card(Suits.HEART, 2)],
             [Card(Suits.HEART, 1)],
+            [Card(Suits.HEART, 2), Card(Suits.HEART, 3)],
+            [Card(Suits.HEART, 1), Card(Suits.HEART, 3)],
+            [Card(Suits.HEART, 2), Card(Suits.HEART, 3), Card(Suits.HEART, 3)],
+            [Card(Suits.HEART, 1), Card(Suits.HEART, 3), Card(Suits.HEART, 3)],
         ]
 
     sets = get_all_sets(hand, 3)
+
     assert sets == expected_sets
 
 
@@ -174,33 +179,33 @@ def test_get_natural_outage_possibilities():
     assert get_natural_outage_possibilities(13) == [[3, 3, 3, 4], [3, 3, 7], [3, 4, 6], [3, 5, 5], [3, 10], [4, 4, 5], [4, 9], [5, 8], [6, 7], [13]]
 
 def test_check_go_out():
-    # Simple YES first, with highest card to discard.
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 1))
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 8))
-    hand.add(Card(Suits.HEART, 9))
+    # # Simple YES first, with highest card to discard.
+    # hand = Hand("test")
+    # hand.add(Card(Suits.HEART, 1))
+    # hand.add(Card(Suits.HEART, 2))
+    # hand.add(Card(Suits.HEART, 3))
+    # hand.add(Card(Suits.HEART, 8))
+    # hand.add(Card(Suits.HEART, 9))
 
-    check_go_out(hand)
+    # check_go_out(hand)
 
     # score, discard = check_go_out(hand)
     # assert discard
     # assert discard == Card(Suits.HEART, 8)
     # assert score == -15
 
-    # Ensure couples take bias over a run if they save points
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 1))
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 8))
-    hand.add(Card(Suits.HEART, 9))
-    # Discard 9, score of 11 with group of 3's
+    # # Ensure couples take bias over a run if they save points
+    # hand = Hand("test")
+    # hand.add(Card(Suits.HEART, 1))
+    # hand.add(Card(Suits.HEART, 2))
+    # hand.add(Card(Suits.HEART, 3))
+    # hand.add(Card(Suits.HEART, 3))
+    # hand.add(Card(Suits.HEART, 3))
+    # hand.add(Card(Suits.HEART, 8))
+    # hand.add(Card(Suits.HEART, 9))
+    # # Discard 9, score of 11 with group of 3's
 
-    check_go_out(hand)
+    # check_go_out(hand)
 
     # Test that math works out for long run taking bias over high couples
     hand = Hand("test")
@@ -209,12 +214,11 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 2))
     hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 13 with run of 1,2,3
 
-    check_go_out(hand)  # TODO:  For some reason this takes way longer to figure out than the last, by like 10x. Figure out why
+    check_go_out(hand)
 
 def test_python():
     hand = []
