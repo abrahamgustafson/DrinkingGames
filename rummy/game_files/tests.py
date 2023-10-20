@@ -74,6 +74,22 @@ def test_get_all_sets():
     sets = get_all_sets(hand, 3)    
     assert sets == expected_sets
 
+    
+    # Test with duplicates of the same card
+    hand = Hand("test")
+
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.HEART, 8))
+    hand.add(Card(Suits.HEART, 9))
+    expected_sets = [[Card(Suits.HEART, 3), Card(Suits.HEART, 3), Card(Suits.DIAMOND, 3)]]
+
+    sets = get_all_sets(hand, 6)
+    assert sets == expected_sets
+
 
 def test_get_all_runs():
     # Test 1 run with 1 duplicate
@@ -160,18 +176,18 @@ def test_check_go_out():
 
     check_go_out(hand)
 
-    # # Test that math works out for long run taking bias over high couples
-    # hand = Hand("test")
-    # hand.add(Card(Suits.HEART, 1))
-    # hand.add(Card(Suits.HEART, 1))
-    # hand.add(Card(Suits.HEART, 1))
-    # hand.add(Card(Suits.HEART, 2))
-    # hand.add(Card(Suits.HEART, 3))
-    # hand.add(Card(Suits.HEART, 8))
-    # hand.add(Card(Suits.HEART, 9))
-    # # Discard 9, score of 13 with run of 1,2,3
+    # Test that math works out for long run taking bias over high couples
+    hand = Hand("test")
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 8))
+    hand.add(Card(Suits.HEART, 9))
+    # Discard 9, score of 13 with run of 1,2,3
 
-    # check_go_out(hand)
+    check_go_out(hand)
 
 def test_python():
     hand = []

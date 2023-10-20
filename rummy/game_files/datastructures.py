@@ -5,6 +5,8 @@ import logging
 import random
 
 from enum import Enum
+from ordered_enum import OrderedEnum
+
 from itertools import permutations
 
 
@@ -53,7 +55,7 @@ SUIT_TEXT_MAP = {
 }
 
 
-class Suits(Enum):
+class Suits(OrderedEnum):
     CLUB = 0
     SPADE = 1
     HEART = 2
@@ -302,7 +304,12 @@ def get_all_sets(hand, round):
         """
         # Infinite recursion possibility...
         if len(ongoing_set) == desired_set_len:
-            groups.append(ongoing_set)
+            # TODO: Fix bug some other way? If we have [3h, 3h, 3d], we have 3 duplicate groups.
+            # Really there should be one. (Combination, not permutation). Going to sort and check if it exists
+            # prior to adding..
+            ongoing_set.sort(key=lambda x: x.suit)
+            if ongoing_set not in groups:
+                groups.append(ongoing_set)
             return
         
         # We should never call this with a wild as the starter
@@ -328,7 +335,7 @@ def get_all_sets(hand, round):
             temp_run.append(found_card)
             non_wilds_copy = copy.deepcopy(non_wilds)
             non_wilds_copy.remove(found_card)
-            recurse_until_options_exhausted(temp_run, non_wilds, available_wilds, desired_set_len, groups)
+            recurse_until_options_exhausted(temp_run, non_wilds_copy, available_wilds, desired_set_len, groups)
         if len(available_wilds) > 0:
             temp_run = copy.deepcopy(ongoing_set)
             temp_available_wilds = copy.deepcopy(available_wilds)
@@ -469,6 +476,8 @@ def check_go_out(hand, existing_groups=None):
     sets = get_all_sets(hand, round)
     
     logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
+    logging.debug(runs)
+    logging.debug(sets)
     combined_groups = runs + sets
 
     # if runs are [a,b,c] and sets are [1,2], iterate assuming something over 3 is a set.
