@@ -1,6 +1,7 @@
 from datastructures import *
 
 def run_tests():
+    test_is_wild()
     test_is_valid_group()
     test_get_natural_outage_possibilities()
     test_get_all_sets()
@@ -8,6 +9,14 @@ def run_tests():
     # test_python()
 
     test_check_go_out()
+
+def test_is_wild():
+    
+    c = Card(Suits.JOKER, 14)
+    assert is_wild(c, 3)
+
+    c = Card(Suits.CLUB, 3)
+    assert is_wild(c, 3)
 
 def test_is_valid_group():
     cards = []
@@ -186,6 +195,35 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 13 with run of 1,2,3
+
+    check_go_out(hand)
+
+    # Errored hand:
+    hand = Hand("test")
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 1))
+    hand.add(Card(Suits.CLUB, 11))
+    hand.add(Card(Suits.CLUB, 5))
+
+    check_go_out(hand)
+
+    # Errored hand : <[♣6], [ʷW], [♣6], [ʷW]>
+    hand = Hand("test")
+    hand.add(Card(Suits.JOKER, 6))
+    hand.add(Card(Suits.CLUB, 14))
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.JOKER, 14))
+
+    check_go_out(hand)
+
+    # Forever hand : <[♢9], [♢5], [♢Q], [ʷW], [ʷW], [♣5]>
+    hand = Hand("test")
+    hand.add(Card(Suits.DIAMOND, 9))
+    hand.add(Card(Suits.DIAMOND, 5))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 5))
 
     check_go_out(hand)
 

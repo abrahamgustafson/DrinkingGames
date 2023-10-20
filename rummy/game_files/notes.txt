@@ -1,8 +1,81 @@
-DEBUG:root:group permutation order length: 362880
-DEBUG:root:Total cycles: 3265920
+Abe : <[ʷW], [♣A], [♣J], [♣5]>
+Traceback (most recent call last):
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 221, in <module>
+    run_script()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 160, in run_script
+    score, discard, groups = check_go_out(round.get_player_hand())
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\datastructures.py", line 574, in check_go_out
+    assert not is_wild(discard, round)
+AssertionError
 
-DEBUG:root:group permutation order length: 3628800
-DEBUG:root:Total cycles: 36288000
 
-DEBUG:root:group permutation order length: 362880
-DEBUG:root:Total cycles: 3265920
+Brenna : <[♣6], [ʷW], [♣6], [ʷW]>
+Traceback (most recent call last):
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 221, in <module>
+    run_script()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 160, in run_script
+    score, discard, groups = check_go_out(round.get_player_hand())
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\datastructures.py", line 577, in check_go_out
+    assert not is_wild(discard, round)
+AssertionError
+
+
+Starting game with players: ['Abe', 'Brenna']
+Round 3 beginning. First player: Abe
+Abe : <[♠A], [♠9], [♢8]>
+Brenna : <[♡6], [♢K], [♣K]>
+INFO:root:---- Total turn: 1, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠A], [♠9], [♢8], [♠8]>
+INFO:root:Discarding: [♠9]
+INFO:root:---- Total turn: 2, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡6], [♢K], [♣K], [♣9]>
+INFO:root:Discarding: [♣K]
+INFO:root:---- Total turn: 3, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠A], [♢8], [♠8], [♣A]>
+INFO:root:Discarding: [♠8]
+INFO:root:---- Total turn: 4, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡6], [♣9], [♢K], [♢9]>
+INFO:root:Discarding: [♢K]
+INFO:root:---- Total turn: 5, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠A], [♣A], [♢8], [♠Q]>
+INFO:root:Discarding: [♠Q]
+INFO:root:---- Total turn: 6, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡6], [♣9], [♢9], [♡8]>
+INFO:root:Discarding: [♢9]
+INFO:root:---- Total turn: 7, Players turn: Abe
+INFO:root:Drawing from top of deck
+INFO:root:Discarding: [♣J]
+INFO:root:---- Total turn: 9, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠A], [♣A], [♢8], [ʷW]>
+INFO:root:Discarding: [♢8]
+INFO:root:Abe is out! Hand:
+INFO:root:[[♣A], [♠A], [ʷW]]
+Abe : <[♠A], [♣A], [ʷW]>
+Brenna : <[♡6], [♡8], [♣9]>
+
+
+
+DEBUG:root:Getting Starting check_go_out. Run options: 8, Set options: 6
+DEBUG:root:[
+    [[♢9], [ʷW], [ʷW]],
+    [[♢Q], [ʷW], [ʷW]],
+    [[♢9], [ʷW], [ʷW], [♢Q]],
+    [[♢9], [ʷW], [ʷW], [♣5]],
+    [[♢Q], [ʷW], [ʷW], [♣5]],
+    [[♢9], [ʷW], [ʷW], [♢Q], [♣5]],
+    [[♢9], [ʷW], [ʷW], [♣5], [♢5]],
+    [[♢Q], [ʷW], [ʷW], [♣5], [♢5]]]
+DEBUG:root:[
+    [[♢9], [ʷW], [ʷW]],
+    [[♢Q], [ʷW], [ʷW]],
+    [[♣5], [♢9], [ʷW], [ʷW]],
+    [[♣5], [♢Q], [ʷW], [ʷW]],
+    [[♣5], [♢9], [♢5], [ʷW], [ʷW]],
+    [[♣5], [♢Q], [♢5], [ʷW], [ʷW]]]

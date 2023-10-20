@@ -40,9 +40,21 @@ class Round:
     def print_state(self):
         for _, hand in self.player_to_hand_map.items():
             print(hand)
+    
+    def print_player_state(self):
+        print(self.player_to_hand_map[self.player_list[self.get_next_player()]])
 
     def get_next_player(self):
         return self.next_player_index
+    
+    def get_next_player_name(self):
+        return self.player_list[self.next_player_index]
+    
+    def next_turn(self):
+        if self.next_player_index + 1 >= len(self.player_list):
+            self.next_player_index = 0
+        else:
+            self.next_player_index += 1
     
     def draw_from_deck(self):
         # Don't let someone draw twice.
@@ -51,8 +63,14 @@ class Round:
     def draw_from_discard(self):
         self.player_to_hand_map[self.player_list[self.get_next_player()]].add(self.discard_pile.pop())
 
+    def get_player_hand(self):
+        return self.player_to_hand_map[self.player_list[self.get_next_player()]]
+
     def peek_discard(self):
         return self.discard_pile.peek()
+    
+    def discard(self, card):
+        self.discard_pile.add(card)
 
 
 class Game:
@@ -78,59 +96,84 @@ class Game:
         return self.active_round
 
 
-def try_go_out(hand, round):
-    """
-    Try to go out, assuming this is the first user to go out, and that they have already drawn
-    an extra card.
+# def try_go_out(hand, round):
+#     """
+#     Try to go out, assuming this is the first user to go out, and that they have already drawn
+#     an extra card.
 
-    Args:
-        hand(Hand): hand object, assuming that hand drew an extra card already (and needs to discard)
-        round(int): round of the game. This number == wild card
+#     Args:
+#         hand(Hand): hand object, assuming that hand drew an extra card already (and needs to discard)
+#         round(int): round of the game. This number == wild card
 
-    Returns:
-        bool: can go out or not
-        Card: card to discard
-        sorted hand
-    """
-    min_grouping_factor = 3
+#     Returns:
+#         bool: can go out or not
+#         Card: card to discard
+#         sorted hand
+#     """
+#     min_grouping_factor = 3
 
-    hand.sort()
+#     hand.sort()
 
-    cards_copy = hand.cards.copy()
+#     cards_copy = hand.cards.copy()
 
-    wilds = []
-    for card in cards_copy:
-        if card.suit == Suits.JOKER:
-            wilds.append(card)
-        if card.value == round:
-            wilds.append(card)
+#     wilds = []
+#     for card in cards_copy:
+#         if card.suit == Suits.JOKER:
+#             wilds.append(card)
+#         if card.value == round:
+#             wilds.append(card)
     
-    for wild in wilds:
-        cards_copy.remove(wild)
+#     for wild in wilds:
+#         cards_copy.remove(wild)
 
-    print("Wilds:")
-    print(*wilds, sep=',')
-    print("Cards:")
-    print(*cards_copy, sep=',')
-    multiples = []
-    for card in cards_copy:
-        pass
+#     print("Wilds:")
+#     print(*wilds, sep=',')
+#     print("Cards:")
+#     print(*cards_copy, sep=',')
+#     multiples = []
+#     for card in cards_copy:
+#         pass
     
 
 def run_script():
 
     player_list = ["Abe", "Brenna"]
     game = Game(player_list, 2)
-    round = game.initialize_round(3)
+    round = game.initialize_round(3)  # Tried going up to 5 and it crashed..
 
     # print("Player hands:\n{}".format(round.player_to_hand_map))
     round.print_state()
-    print(round.peek_discard())
-    round.draw_from_discard()
-    # round.draw_from_deck()
+    # print(round.peek_discard())
+
+    player_out = False
+    turn = 0
+    while not player_out:
+        turn += 1
+        logging.info("---- Total turn: {}, Players turn: {}".format(turn, round.get_next_player_name()))
+        logging.info("Drawing from top of deck")
+        round.draw_from_deck()
+        round.print_player_state()
+
+        # score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
+        # discard(Card): popped off the hand
+        # Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
+        score, discard, groups = check_go_out(round.get_player_hand())
+
+        logging.info("Discarding: {}".format(discard))
+        round.discard(discard)
+
+        if score <= 0:
+            player_out = True
+            logging.info("{} is out! Hand:".format(round.get_next_player_name()))
+            for group in groups:
+                logging.info(group)
+
+
+        round.next_turn()
+
     round.print_state()
 
-    try_go_out(round.player_to_hand_map["Abe"], 3)
+    # try_go_out(round.player_to_hand_map["Abe"], 3)
     
 
 """
@@ -165,6 +208,9 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Test playground')
     # parser.add_argument('--game_csv', metavar='[GAME.csv]', type=str,
     #                     help='Name of file in DrinkingGames/rummy/datasets/')
+    
+    # logging.getLogger().setLevel(logging.INFO)
+
     args = parser.parse_args()
     print(args)
 

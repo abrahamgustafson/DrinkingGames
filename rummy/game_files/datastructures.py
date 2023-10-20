@@ -460,7 +460,8 @@ def check_go_out(hand, existing_groups=None):
         existing_groups(list): List of existing groups of cards that are out
     Returns:
         score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
-        discard: popped off the hand
+        discard(Card): popped off the hand
+        Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
     """
     if not existing_groups:
         existing_groups = list()
@@ -566,11 +567,16 @@ def check_go_out(hand, existing_groups=None):
         # Add up the score and record this outcome.
         # Implicitly anything in a group is zero points, just have to count the extra cards
         
-        hand_copy.sort()  # last card should be highest?
+        # Sort by value of card, and return the one with the highest value...?
+        # hand_copy.sort()  # last card should be highest?
+        hand_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
         discard = hand_copy[len(hand_copy) - 1]
 
         # State invalidation.
-        assert not is_wild(discard, round)
+        # logging.debug("INVALID: hand_copy: {},  discard: {}".format(hand_copy, discard))
+        # It's viable to discard a wild IFF you are going out
+        if len(hand_copy) > 1:
+            assert not is_wild(discard, round)
 
         hand_copy.remove(discard)
         for card in hand_copy:
@@ -583,27 +589,29 @@ def check_go_out(hand, existing_groups=None):
 
     # Sort by the lowest value...
     outage_scenarios.sort(key = lambda x: x[3]) 
-    print(" -- Best scenario, given hand: ")
-    for card in non_wild_cards:
-        print(card)
-    print("-- Is:")
-    for group in outage_scenarios[0][0]:
-        print(" - Group: ")
-        for card in group:
-            print(card)
-    print(" - Discard: {}".format(outage_scenarios[0][1]))
-    print(" - Score: {}".format(outage_scenarios[0][3]))
+    # print(" -- Best scenario, given hand: ")
+    # for card in non_wild_cards:
+    #     print(card)
+    # print("-- Is:")
+    # for group in outage_scenarios[0][0]:
+    #     print(" - Group: ")
+    #     for card in group:
+    #         print(card)
+    # print(" - Discard: {}".format(outage_scenarios[0][1]))
+    # print(" - Score: {}".format(outage_scenarios[0][3]))
 
+    # Greedy strategy, just discard the highest card that isn't in a run.
+    # list(tuple(scenario_selection_group, discard, other_cards, score))
+    """
+        Returns:
+        score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
+        discard(Card): popped off the hand
+        Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
+    """
+    chosen_scenario = outage_scenarios[0]
+    hand.remove(chosen_scenario[1])
 
-    # One strategy:
-    #  - Create all possible card combinations, based on sorted card order...
-    #    EG: [0,1,2] for a hand of 3's, or for 6's: [[0,1,2],[3,4,5]], [[0,2,5],[2,3,4]]
-    #  - Then loop throughand pick the one that has the lowest score.
-    #     -- Note that jokers screw up the sort, so have to do any order... that could get too big
-    
-
-    # First priority should be to go out naturally, optimize for that..
-    # natural_outage_possibilities = get_natural_outage_possibilities(round)
+    return chosen_scenario[3], chosen_scenario[1], chosen_scenario[0]
 
     # Card discard strategy, return the highest card with the least combinations
 
