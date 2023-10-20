@@ -165,8 +165,7 @@ class Hand:
 
     def sort(self):
         # TODO: Might have to make a secondary sort on the suit... 
-        # Also I shouldn't have done reverse...
-        self.cards.sort(key=lambda x: x.value, reverse=True)
+        self.cards.sort(key=lambda x: x.value)
 
     def sorted_cards_minus_wilds(self, round):
         """
@@ -275,52 +274,83 @@ def is_valid_group(card_list, round):
         running_wild_counter = 0
 
     return True
-    
+
+
 def get_all_sets(hand, round):
     """
-    if input is [3,3,4], return [[3,3],[4]]
-
-    if input is [1,1,2,4], return [[1,1], [1,1,4], [2], [2,4]]
-
-    Sets are duplicates of the same card (excluding wilds).
-    """
-    def make_set_group(c, i):
-        g = []
-        while i < len(c) and c[i].value == c[i - 1].value:
-            g.append(c[i - 1])
-            i += 1
-        g.append(c[i - 1])
-        return i, g
+    if input is [3,3,4], return []
     
-    index = 1
+    if input is [1,1,1,2,4], return [[1,1,1], [1,1,4]]
+
+    Sets are duplicates of the same card including wilds
+    """
+    
     groups = []
-    cards = hand.sorted_cards_minus_wilds(round)
-    # Doing this because the inner loop has a break out, and that's how we add the last card.
-    while index <= len(cards):
-        index, group = make_set_group(cards, index)
-        groups.append(group)
-        index += 1
-
-    # Go back and add wilds.. 
-    # [[1,1], [2]]
-    # [[1,1], [2], [1,1,4], [2,4]]
-    # [[1,1], [2], [1,1,4], [2,4], [1,1,4,4], [2,4,4]]
-
-    # TODO: If i'm incorporating wilds here, I really shouldn't do groups that are less than 3 in size...
-    # If I play on 
-  
+    non_wild_cards = hand.sorted_cards_minus_wilds(round)
     wilds = hand.wilds(round)
-    non_wilds_group_copy = copy.deepcopy(groups)
 
-    for idx, wild in enumerate(wilds):
-        groups_copy = copy.deepcopy(non_wilds_group_copy)
-        for group in groups_copy:
-            group.append(wild)
-            # Need to add additional wilds as combinations. Don't need permutation though.
-            for i in range(0, idx):
-                group.append(wilds[i])
-            groups.append(group)
+    non_wild_cards_copy = copy.deepcopy(non_wild_cards)
 
+    def recurse_until_options_exhausted(ongoing_set, non_wilds, available_wilds, desired_set_len, groups):
+        """
+        Args:
+            ongoing_set(list(Card)): List of cards in the set, (EG, starting would be [4h])
+            non_wilds(list(Card)): Non wild cards, immutable
+            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
+            desired_set_len
+        Return when options exhausted
+        """
+        # Infinite recursion possibility...
+        if len(ongoing_set) == desired_set_len:
+            groups.append(ongoing_set)
+            return
+        
+        # We should never call this with a wild as the starter
+        last_non_wild_card = None
+        for card in reversed(ongoing_set):
+            if not is_wild(card, round):
+                last_non_wild_card = card
+                break
+        if not last_non_wild_card:
+            raise Exception("State invalidation, cannot enter with a list of only wilds")
+        
+        # 6h 0 back means we need any 6.
+        needed_card_value = last_non_wild_card.value
+        found_card = None
+        for card in non_wilds:
+            if card.value == needed_card_value:
+                found_card = card
+                break
+
+        if found_card:
+            # We do have to remove this card from the available cards in this equation...
+            temp_run = copy.deepcopy(ongoing_set)
+            temp_run.append(found_card)
+            non_wilds_copy = copy.deepcopy(non_wilds)
+            non_wilds_copy.remove(found_card)
+            recurse_until_options_exhausted(temp_run, non_wilds, available_wilds, desired_set_len, groups)
+        if len(available_wilds) > 0:
+            temp_run = copy.deepcopy(ongoing_set)
+            temp_available_wilds = copy.deepcopy(available_wilds)
+            # Pop is from the back, but it doesn't matter..
+            temp_run.append(temp_available_wilds.pop())
+            recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_set_len, groups)
+        return
+
+
+    # For round 3 (4 cards with discard) loop once...
+    for set_length in range(3, len(hand.cards)):
+        # Use each card as a starter to see if it can make a len 3 run.
+        # Yes, this will include duplicates if we have 2 [3h],
+        # TODO: Could optimize (but think it's okay)
+        for starting_card in non_wild_cards_copy:
+
+            starting_set_group = [starting_card]
+            non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards_copy)
+            non_wild_cards_copy_copy.remove(starting_card)
+            # Safe to pass wilds, it will copy before we remove..
+            recurse_until_options_exhausted(starting_set_group, non_wild_cards_copy_copy, wilds, set_length, groups)
+            
     return groups
 
 
@@ -329,61 +359,70 @@ def get_all_runs(hand, round):
     if input is [3h,3d,4h], return [[3h,4h],[3d]]
     Runs are incrementing values of the same suit (excluding wilds)
     """
-
-    # TODO: I gotta fix this actually... this should return differently.
-    # If it is [3h, 4h, 5h, 6h], options should be:
-    # [3h, 4h, 5h], [4h, 5h, 6h], [3h, 4h, 5h, 6h].. 
-    def make_run(c):
-        g = []
-        current_card = c[0]
-        g.append(current_card)
-
-        i = 1
-        while i < len(c):
-            # If it's the same card, skip 
-            if current_card.value == c[i].value:
-                i += 1
-                continue
-            
-            # If the card is in a run, add it.
-            if current_card.suit == c[i].suit and current_card.value == c[i].value + 1:
-                g.append(c[i])
-                current_card = c[i]
-                i += 1
-                continue
-
-            # Early break clause, if the value is two higher...
-            if current_card.value < c[i].value + 1:
-                break
-
-            # Base case? We just increment and continue?
-            i += 1
-        return g
     
     groups = []
-    cards = hand.sorted_cards_minus_wilds(round)
-    
-    # Need a copy of <cards left> and we iterate through with the first each time, 
-    # Try to find something that follows this card, then follows the next card, then add them
-    # as a contiguous set -- removing them from the cards...
-    while len(cards) > 0:
-        group = make_run(cards)
-        groups.append(group)
-
-        # Brute force, should make this more efficient.
-        for c in group:
-            cards.remove(c)
-
-    # TODO: I gotta figure out how to do wilds as well
-    # If it is [4h, 5h, 7h, 8h, W], options should be:
-    # [W, 4h, 5h], [4h, 5h, W], [W, 7h, 8h], [7h, 8h, W]
-    # [5h, W, 7h]
-    # [4h, 5h, W, 7h], [5h, W, 7h, 8h]
-    # [4h, 5h, W, 7h, 8h]
-
+    non_wild_cards = hand.sorted_cards_minus_wilds(round)
     wilds = hand.wilds(round)
-    non_wilds_group_copy = copy.deepcopy(groups)
 
+    non_wild_cards_copy = copy.deepcopy(non_wild_cards)
+
+    def recurse_until_options_exhausted(ongoing_run, non_wilds, available_wilds, desired_run_len, groups):
+        """
+        Args:
+            ongoing_run(list(Card)): List of cards in the run, (EG, starting would be [4h])
+            non_wilds(list(Card)): Non wild cards, immutable
+            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
+            desired_run_len
+        Return when options exhausted
+        """
+        # Infinite recursion possibility...
+        if len(ongoing_run) == desired_run_len:
+            groups.append(ongoing_run)
+            return
+        
+        # We should never call this with a wild as the starter
+        last_non_wild_card = None
+        last_non_wild_cards_back = 0
+        for i, card in enumerate(reversed(ongoing_run)):
+            if not is_wild(card, round):
+                last_non_wild_card = card
+                last_non_wild_cards_back = i
+                break
+        if not last_non_wild_card:
+            raise Exception("State invalidation, cannot enter with a list of only wilds")
+        
+        # 6h 0 back means we need 7h. 6h 1 back means we need 8h.
+        needed_card = Card(last_non_wild_card.suit, last_non_wild_card.value + last_non_wild_cards_back + 1)
+        found_card = False
+        for card in non_wilds:
+            if card == needed_card:
+                found_card = True
+                break
+
+        if found_card:
+            temp_run = copy.deepcopy(ongoing_run)
+            temp_run.append(needed_card)
+            recurse_until_options_exhausted(temp_run, non_wilds, available_wilds, desired_run_len, groups)
+        if len(available_wilds) > 0:
+            temp_run = copy.deepcopy(ongoing_run)
+            temp_available_wilds = copy.deepcopy(available_wilds)
+            # Pop is from the back, but it doesn't matter..
+            temp_run.append(temp_available_wilds.pop())
+            recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_run_len, groups)
+        return
+
+
+    # For round 3 (4 cards with discard) loop once...
+    for run_length in range(3, len(hand.cards)):
+        # Use each card as a starter to see if it can make a len 3 run.
+        # Yes, this will include duplicates if we have 2 [3h],
+        # TODO: Could optimize (but think it's okay)
+        for starting_card in non_wild_cards_copy:
+
+            starting_run_group = [starting_card]
+            # Safe to pass wilds, it will copy before we remove..
+            recurse_until_options_exhausted(starting_run_group, non_wild_cards, wilds, run_length, groups)
+            
     return groups
 
 
@@ -424,8 +463,12 @@ def check_go_out(hand, existing_groups=None):
 
     non_wild_cards = hand.sorted_cards_minus_wilds(round)
     num_wilds = len(hand.cards) - len(non_wild_cards)
+    logging.debug("Getting all runs")
     runs = get_all_runs(hand, round)
+    logging.debug("Getting all sets")
     sets = get_all_sets(hand, round)
+    
+    logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
     combined_groups = runs + sets
 
     # if runs are [a,b,c] and sets are [1,2], iterate assuming something over 3 is a set.
@@ -436,14 +479,6 @@ def check_go_out(hand, existing_groups=None):
     # possible combination to get the lowest sum value.
     # Could bias to start with higher combinations of cards and all that, or could brute force..
     # Really we should consider everything, so may as well brute force.
-
-    
-
-    for wild_count in range(0, num_wilds):
-        print("solve with a wild")
-        # Solve with a wild.
-
-    # Solve without wilds
 
     """
     x: [1,2]
@@ -467,6 +502,8 @@ def check_go_out(hand, existing_groups=None):
     # list(tuple(scenario_selection_group, discard, other_cards, score))
     outage_scenarios = []
 
+    # TODO: Optimize to return early if we get something with a 0 score...
+    # TODO: Ignore the case where you could discard a wild to get -15...
     
     logging.debug('group permutation order length: {}'.format(len(group_permutation_order)))
     total_cycles = 0
@@ -484,7 +521,7 @@ def check_go_out(hand, existing_groups=None):
 
             # Get the group, regardless of type
             group = combined_groups[order[group_index]]
-            is_run_group = bool(order[group_index] < len(runs))
+            # is_run_group = bool(order[group_index] < len(runs))
 
             # Base base case... If the hand is empty, we have removed all the cards!
             if len(hand_copy) < 1:
