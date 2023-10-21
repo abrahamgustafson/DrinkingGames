@@ -94,52 +94,13 @@ class Game:
         # Todo, rotate next starter...
         self.active_round = Round(self.player_list, round, self.decks)
         return self.active_round
-
-
-# def try_go_out(hand, round):
-#     """
-#     Try to go out, assuming this is the first user to go out, and that they have already drawn
-#     an extra card.
-
-#     Args:
-#         hand(Hand): hand object, assuming that hand drew an extra card already (and needs to discard)
-#         round(int): round of the game. This number == wild card
-
-#     Returns:
-#         bool: can go out or not
-#         Card: card to discard
-#         sorted hand
-#     """
-#     min_grouping_factor = 3
-
-#     hand.sort()
-
-#     cards_copy = hand.cards.copy()
-
-#     wilds = []
-#     for card in cards_copy:
-#         if card.suit == Suits.JOKER:
-#             wilds.append(card)
-#         if card.value == round:
-#             wilds.append(card)
-    
-#     for wild in wilds:
-#         cards_copy.remove(wild)
-
-#     print("Wilds:")
-#     print(*wilds, sep=',')
-#     print("Cards:")
-#     print(*cards_copy, sep=',')
-#     multiples = []
-#     for card in cards_copy:
-#         pass
     
 
 def run_script():
 
     player_list = ["Abe", "Brenna"]
     game = Game(player_list, 2)
-    round = game.initialize_round(3)  # Tried going up to 5 and it crashed..
+    round = game.initialize_round(13)  # Tried going up to 5 and it crashed..
 
     # print("Player hands:\n{}".format(round.player_to_hand_map))
     round.print_state()
@@ -209,13 +170,13 @@ if __name__ == "__main__":
     # parser.add_argument('--game_csv', metavar='[GAME.csv]', type=str,
     #                     help='Name of file in DrinkingGames/rummy/datasets/')
     
-    # logging.getLogger().setLevel(logging.INFO)
+    logging.getLogger().setLevel(logging.INFO)
 
     args = parser.parse_args()
     print(args)
 
-    run_tests()
+    # run_tests()
 
     # load_all_games()
     # run_script(**vars(args))
-    # run_script()
+    run_script()

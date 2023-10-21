@@ -448,6 +448,56 @@ def get_natural_outage_possibilities(round):
         return combinations
 
     return find_combinations(round, 3)
+
+def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups):
+    """
+    Probably want to evaluate before pushing whether the selected next index works..
+    That way the caller can decide to push itself as <end of a tree>
+    
+    Args:
+        group_order_so_far(list(idx)): List of indexes selected in this path (relative to the groups_reference)
+        remaining_cards(list(Card)): List of cards left in the hand
+        groups_left(list(idx)): List of indexes left unselected in this path (relative to the groups_reference)
+        groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
+        truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
+    """
+    # Should it add each time a group doesn't work..? or just if nothing works?
+    # If it was [1,2,3,4], and we were at [1] with [2,3,4] left, 
+    # at [1]->[2] [3,4] we would at least want to consider the [3,4] as next steps, or each would add [1]..
+    viable_next_indexes = []
+    for group_idx in groups_left:
+        group = groups_reference[group_idx]
+
+        # If this group is >= remaining_cards, that means we ignore it. Have to have a discard.
+        if len(group) >= len(remaining_cards):
+            continue
+
+        # Check to see if all cards are possible to remove, if they are, continue with this as viable.
+        remaining_cards_copy = copy.deepcopy(remaining_cards)
+        all_cards_work = True
+        for card in group:
+            if card in remaining_cards_copy:
+                remaining_cards_copy.remove(card)
+            else:
+                all_cards_work = False
+                break
+        if all_cards_work:
+            viable_next_indexes.append(group_idx)
+            group_order_so_far_copy = copy.deepcopy(group_order_so_far)
+            groups_left_copy = copy.deepcopy(groups_left)
+            group_order_so_far_copy.append(group_idx)
+            groups_left_copy.remove(group_idx)
+
+            recursive_scenario_solve(
+                group_order_so_far_copy,
+                remaining_cards_copy,
+                groups_left_copy,
+                groups_reference,
+                truncated_groups)
+    
+    # If no scenarios were viable to continue with, this is the end of a tree.
+    if not viable_next_indexes:
+        truncated_groups.append(group_order_so_far)
     
 
 def check_go_out(hand, existing_groups=None):
@@ -465,7 +515,7 @@ def check_go_out(hand, existing_groups=None):
     """
     if not existing_groups:
         existing_groups = list()
-    assert len(hand.cards) > 2 and len(hand.cards) < 14
+    assert len(hand.cards) > 2 and len(hand.cards) < 15
     round = len(hand.cards) - 1
     hand.sort()
 
@@ -481,133 +531,96 @@ def check_go_out(hand, existing_groups=None):
     logging.debug(sets)
     combined_groups = runs + sets
 
-    # if runs are [a,b,c] and sets are [1,2], iterate assuming something over 3 is a set.
-    group_permutation_order = list(permutations(range(len(runs) + len(sets))))
-
-    # Other strategy:
-    # Loop through each <runs> and <sets> with a wild count. Try to string them together in every
-    # possible combination to get the lowest sum value.
-    # Could bias to start with higher combinations of cards and all that, or could brute force..
-    # Really we should consider everything, so may as well brute force.
-
-    """
-    x: [1,2]
-    y: [a,b,c]
-
-    for iy in range(len(y))
-        for ix in range(len(x))
-            loop through each combination, starting with x[0] going x+ first, then y+,
-            Then do y[0] first, going x+ then y+
-
-    outcome list:
-     - [1,2,a,b,c]
-     - [1,a,b,c,2]...
-
-     No, just get a all unique combinations of x and y and run them...
     
-     -- 
-     Do a greedy alg to use wild count to chain together?
-    """
+    # TODO: Get good at python...
+    group_indexes = []
+    for idx, _ in enumerate(combined_groups):
+        group_indexes.append(idx)
+
+    # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
+    truncated_groups = []
+
+    # Starter loop, we try each one as the starter..
+    for idx, group in enumerate(combined_groups):
+        # Should be impossible to have one of the starter groups not fit. Blind add them.
+        group_order_so_far = [idx]
+        cards_copy = copy.deepcopy(hand.cards)
+
+        # Should be impossible to have a group that doesn't work, blindly remove.
+        for card in group:
+            cards_copy.remove(card)
+        
+        groups_left = copy.deepcopy(group_indexes)
+        groups_left.remove(idx)
+
+        recursive_scenario_solve(
+                group_order_so_far,
+                cards_copy,
+                groups_left,
+                combined_groups,
+                truncated_groups)
+
+    # What I'm left with here: truncated_groups
+    # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
+
 
     # list(tuple(scenario_selection_group, discard, other_cards, score))
     outage_scenarios = []
 
-    # TODO: Optimize to return early if we get something with a 0 score...
-    # TODO: Ignore the case where you could discard a wild to get -15...
-    
-    logging.debug('group permutation order length: {}'.format(len(group_permutation_order)))
-    total_cycles = 0
-    for order in group_permutation_order:
+    # Loop through each, select a discard, and calculate a score
+    for truncated_group in truncated_groups:
+        card_groups = []
 
-        group_index = 0
-        scenario_selection_groups = []
-        scenario_score = 0
-        hand_copy = hand.cards.copy()
-
-        # a "group", aka combined_groups[order[group_index]] will be a list of dards that are either a run, or a set..
-        # EG, [3h,4h,5h] or [3h,3d,3h]
-        while group_index < len(order):
-            total_cycles += 1
-
-            # Get the group, regardless of type
-            group = combined_groups[order[group_index]]
-            # is_run_group = bool(order[group_index] < len(runs))
-
-            # Base base case... If the hand is empty, we have removed all the cards!
-            if len(hand_copy) < 1:
-                break
-
-            # Base case, no wilds, continue if length doesn't fit.
-            if len(group) < 3:  # Should probably do something other than hardcoded 3...
-                group_index += 1
-                continue
-
-            # If here, implicitly it is 3 in a row. 
-            # Ensure all cards here are available, otherwise skip to the next
-            
-            # We will try to remove before we actually remove... If we can't this group doesn't work
-            temp_hand_copy = hand_copy.copy()
-            all_good = True
-            for card in group:
-                if card not in temp_hand_copy:
-                    all_good = False
-                    break
-                temp_hand_copy.remove(card)
-            
-            if not all_good:
-                group_index +=1
-                continue
-
-            # We are good, add this as a group, and remove the cards from play
-            scenario_selection_groups.append(group)
-            hand_copy = temp_hand_copy
-            group_index +=1
-
-        # We have effectively consumed all the cards in this order, or we have gone out.
-        # Add up the score and record this outcome.
-        # Implicitly anything in a group is zero points, just have to count the extra cards
+        for group_index in truncated_group:
+            card_groups.append(combined_groups[group_index])
         
-        # Sort by value of card, and return the one with the highest value...?
-        # hand_copy.sort()  # last card should be highest?
-        hand_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
-        discard = hand_copy[len(hand_copy) - 1]
-
+        cards_copy = copy.deepcopy(hand.cards)
+        for group in card_groups:
+            for card in group:
+                cards_copy.remove(card)
+        
+        assert len(cards_copy) >= 1
+        cards_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
+        discard = cards_copy[len(cards_copy) - 1]
+        
         # State invalidation.
-        # logging.debug("INVALID: hand_copy: {},  discard: {}".format(hand_copy, discard))
         # It's viable to discard a wild IFF you are going out
-        if len(hand_copy) > 1:
-            assert not is_wild(discard, round)
+        # if len(cards_copy) > 1:
+        #     assert not is_wild(discard, round)
+        
+        cards_copy.remove(discard)
 
-        hand_copy.remove(discard)
-        for card in hand_copy:
+        scenario_score = 0
+        for card in cards_copy:
             scenario_score += get_card_score(card, round)
 
-        outage_scenarios.append((scenario_selection_groups, discard, hand_copy, scenario_score))
+        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score))
 
-    # On looking closer... I think I can keep this same model, I just need to add all wild cards to the combinations...
-    logging.debug("Total cycles: {}".format(total_cycles))
+    # If there are no outage scenarios, we have jack shit... Make one with no groups
+    if len(outage_scenarios) == 0:
+        card_groups = []
+        cards_copy = copy.deepcopy(hand.cards)
+        assert len(cards_copy) >= 1
+        cards_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
+        discard = cards_copy[len(cards_copy) - 1]
+        
+        # State invalidation.
+        # It's viable to discard a wild IFF you are going out
+        if len(cards_copy) > 1:
+            assert not is_wild(discard, round)
+        
+        cards_copy.remove(discard)
+
+        scenario_score = 0
+        for card in cards_copy:
+            scenario_score += get_card_score(card, round)
+
+        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score))
 
     # Sort by the lowest value...
     outage_scenarios.sort(key = lambda x: x[3]) 
-    # print(" -- Best scenario, given hand: ")
-    # for card in non_wild_cards:
-    #     print(card)
-    # print("-- Is:")
-    # for group in outage_scenarios[0][0]:
-    #     print(" - Group: ")
-    #     for card in group:
-    #         print(card)
-    # print(" - Discard: {}".format(outage_scenarios[0][1]))
-    # print(" - Score: {}".format(outage_scenarios[0][3]))
 
     # Greedy strategy, just discard the highest card that isn't in a run.
-    # list(tuple(scenario_selection_group, discard, other_cards, score))
-    """
-        Returns:
-        score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
-        discard(Card): popped off the hand
-        Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
-    """
     chosen_scenario = outage_scenarios[0]
     hand.remove(chosen_scenario[1])
 

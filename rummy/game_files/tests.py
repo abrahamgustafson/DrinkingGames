@@ -6,9 +6,10 @@ def run_tests():
     test_get_natural_outage_possibilities()
     test_get_all_sets()
     test_get_all_runs()
-    # test_python()
-
     test_check_go_out()
+
+    
+    # test_python()
 
 def test_is_wild():
     
@@ -165,12 +166,14 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
 
-    check_go_out(hand)
-
-    # score, discard = check_go_out(hand)
-    # assert discard
-    # assert discard == Card(Suits.HEART, 8)
-    # assert score == -15
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 8
+    assert discard == Card(Suits.HEART, 9)
+    assert groups == [[
+        Card(Suits.HEART, 1),
+        Card(Suits.HEART, 2),
+        Card(Suits.HEART, 3)]]
 
     # Ensure couples take bias over a run if they save points
     hand = Hand("test")
@@ -183,7 +186,14 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 11 with group of 3's
 
-    check_go_out(hand)
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 11
+    assert discard == Card(Suits.HEART, 9)
+    assert groups == [[
+        Card(Suits.HEART, 3),
+        Card(Suits.HEART, 3),
+        Card(Suits.HEART, 3)]]
 
     # Test that math works out for long run taking bias over high couples
     hand = Hand("test")
@@ -194,27 +204,46 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
-    # Discard 9, score of 13 with run of 1,2,3
+    # Discard 9, score of 10 with run of 1,2,3
 
-    check_go_out(hand)
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 10
+    assert discard == Card(Suits.HEART, 9)
+    assert groups == [[
+        Card(Suits.HEART, 1),
+        Card(Suits.HEART, 2),
+        Card(Suits.HEART, 3)]]
 
-    # Errored hand:
+    # Errored hand: -- Can't go out with anything --
     hand = Hand("test")
     hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.CLUB, 1))
     hand.add(Card(Suits.CLUB, 11))
     hand.add(Card(Suits.CLUB, 5))
 
-    check_go_out(hand)
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 6
+    assert discard == Card(Suits.CLUB, 11)
+    assert groups == []
 
     # Errored hand : <[♣6], [ʷW], [♣6], [ʷW]>
     hand = Hand("test")
-    hand.add(Card(Suits.JOKER, 6))
-    hand.add(Card(Suits.CLUB, 14))
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.CLUB, 6))
     hand.add(Card(Suits.JOKER, 14))
 
-    check_go_out(hand)
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 0
+    assert discard == Card(Suits.CLUB, 6)
+    assert groups == [[
+            Card(Suits.CLUB, 6), 
+            Card(Suits.JOKER, 14), 
+            Card(Suits.JOKER, 14), 
+        ]]
 
     # Forever hand : <[♢9], [♢5], [♢Q], [ʷW], [ʷW], [♣5]>
     hand = Hand("test")
@@ -225,7 +254,38 @@ def test_check_go_out():
     hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.CLUB, 5))
 
-    check_go_out(hand)
+    # TODO: Fix this, it is legal, but outputs wrong
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 0
+    assert discard == Card(Suits.DIAMOND, 12)
+    assert groups == [[
+            Card(Suits.DIAMOND, 9), 
+            Card(Suits.JOKER, 14), 
+            Card(Suits.JOKER, 14), 
+        ]]
+    
+    # Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7], [♣Q]>
+    # INFO:root:Discarding: [♡K]
+    hand = Hand("test")
+    hand.add(Card(Suits.DIAMOND, 9))
+    hand.add(Card(Suits.DIAMOND, 5))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 5))
+
+    # TODO: Fix this, it is legal, but outputs wrong
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 0
+    assert discard == Card(Suits.DIAMOND, 12)
+    assert groups == [[
+            Card(Suits.DIAMOND, 9), 
+            Card(Suits.JOKER, 14), 
+            Card(Suits.JOKER, 14), 
+        ]]
+
 
 def test_python():
     hand = []
@@ -234,5 +294,13 @@ def test_python():
     hand.append(Card(Suits.HEART, 11))
     hand.append(Card(Suits.HEART, 5))
     hand.sort()
-    # for h in hand:
-    #     print(h)
+    
+    # Max permutation set before my computer crashes?
+    # Time is not a good metric, but I don't feel like making another..
+    # 10: ~1s
+    # 11: 6 seconds (with a lot of memory to deallocate after)
+    # 12: __ I crash my computer
+    # 12: 479,001,600, 10: 3,628,800
+    logging.debug("Starting max permutation check")
+    group_permutation_order = list(permutations(range(10)))
+    logging.debug("total combinations: {}".format(len(group_permutation_order)))

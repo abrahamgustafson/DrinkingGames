@@ -61,21 +61,125 @@ Abe : <[♠A], [♣A], [ʷW]>
 Brenna : <[♡6], [♡8], [♣9]>
 
 
-
+<[♢9], [♢5], [♢Q], [ʷW], [ʷW], [♣5]>
 DEBUG:root:Getting Starting check_go_out. Run options: 8, Set options: 6
 DEBUG:root:[
-    [[♢9], [ʷW], [ʷW]],
-    [[♢Q], [ʷW], [ʷW]],
-    [[♢9], [ʷW], [ʷW], [♢Q]],
-    [[♢9], [ʷW], [ʷW], [♣5]],
-    [[♢Q], [ʷW], [ʷW], [♣5]],
-    [[♢9], [ʷW], [ʷW], [♢Q], [♣5]],
-    [[♢9], [ʷW], [ʷW], [♣5], [♢5]],
-    [[♢Q], [ʷW], [ʷW], [♣5], [♢5]]]
+    1 [[♢9], [ʷW], [ʷW]],
+    2 [[♢Q], [ʷW], [ʷW]],
+    3 [[♢9], [ʷW], [ʷW], [♢Q]],
+    4 [[♢9], [ʷW], [ʷW], [♣5]],
+    5 [[♢Q], [ʷW], [ʷW], [♣5]],
+    6 [[♢9], [ʷW], [ʷW], [♢Q], [♣5]],
+    7 [[♢9], [ʷW], [ʷW], [♣5], [♢5]],
+    8 [[♢Q], [ʷW], [ʷW], [♣5], [♢5]]]
 DEBUG:root:[
-    [[♢9], [ʷW], [ʷW]],
-    [[♢Q], [ʷW], [ʷW]],
-    [[♣5], [♢9], [ʷW], [ʷW]],
-    [[♣5], [♢Q], [ʷW], [ʷW]],
-    [[♣5], [♢9], [♢5], [ʷW], [ʷW]],
-    [[♣5], [♢Q], [♢5], [ʷW], [ʷW]]]
+    a [[♢9], [ʷW], [ʷW]],
+    b [[♢Q], [ʷW], [ʷW]],
+    c [[♣5], [♢9], [ʷW], [ʷW]],
+    d [[♣5], [♢Q], [ʷW], [ʷW]],
+    e [[♣5], [♢9], [♢5], [ʷW], [ʷW]],
+    f [[♣5], [♢Q], [♢5], [ʷW], [ʷW]]]
+
+Playing out this out given the (2) strategy below... Starting at a 14 permutation (87,178,291,200 combinations)
+    [1,2,3,4,5,6,7,8,a,b,c,d,e,f] -> 1  x
+        [2,3,4,5,6,7,8,a,b,c,d,e,f] -2  x
+        [2,3,4,5,6,7,8,a,b,c,d,e,f] -3  x
+        ...                             x
+    [1,2,3,4,5,6,7,8,a,b,c,d,e,f] -> 2  x
+    [1,2,3,4,5,6,7,8,a,b,c,d,e,f] -> 3  x
+    [1,2,3,4,5,6,7,8,a,b,c,d,e,f] -> 4  x
+    ...
+
+This clearly will work, at least for this 5's case, there will actually only be 5 options, and we will loop 14( x2 depth) times
+May be a bit more thahn that in complex cases, but not here.
+
+
+    2)
+        x: [1,2]
+        y: [a,b,c]
+
+            Order still matters while determining "Mutually exclusive", unless you limit to pairs...
+            EG, starting with 1:
+                1, [2,a,b,c] -> 2
+                    [a,b,c] -> a            x
+                        [b,c] -> b          |
+                            [c] -> c        |
+                        [b,c] -> c          |
+                            [b] -> b        |
+                    [a,b,c] -> b            o
+                        [a,c] -> a          o
+                            [c] -> c        x
+                        [a,c] -> c          x
+                            [a] -> a        |
+                    [a,b,c] -> c            x
+                        ...                 |
+                1, [2,a,b,c] -> a
+                    ...
+                        ...
+                            ...
+                2, [1,a,b,c]
+            BUT --> this could mean the permutations get significantly reduced,
+            The scenarios where this blows up is typically when wilds are introduced.
+
+
+PROBLEM -- Shouldn't be discarding kings
+
+> Starting game with players: ['Abe', 'Brenna']
+> Round 13 beginning. First player: Abe
+> Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7]>
+> Brenna : <[♣8], [♠8], [♣J], [♣9], [♢J], [♢A], [ʷW], [ʷW], [♢3], [♠4], [ʷW], [♣J], [♡5]>
+> INFO:root:---- Total turn: 1, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7], [♣Q]>
+> INFO:root:Discarding: [♡K]
+> INFO:root:---- Total turn: 2, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♣8], [♠8], [♣J], [♣9], [♢J], [♢A], [ʷW], [ʷW], [♢3], [♠4], [ʷW], [♣J], [♡5], [♡10]>
+> INFO:root:Discarding: [♡10]
+> INFO:root:---- Total turn: 3, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[♢2], [♢7], [♠7], [♠9], [♣10], [♢J], [♡Q], [♣Q], [♠K], [ʷW], [ʷW], [ʷW], [ʷW], [♢10]>
+> INFO:root:Discarding: [♠K]
+> INFO:root:---- Total turn: 4, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♢A], [♢3], [♠4], [♡5], [♣8], [♠8], [♣9], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW], [♢8]>
+> INFO:root:Discarding: [♣9]
+> INFO:root:---- Total turn: 5, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[♢2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♡Q], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW], [♣2]>
+> INFO:root:Discarding: [♡Q]
+> INFO:root:---- Total turn: 6, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♢A], [♢3], [♠4], [♡5], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW], [♡K]>
+> INFO:root:Discarding: [♡K]
+> INFO:root:---- Total turn: 7, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[♢2], [♣2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW], [♡J]>
+> INFO:root:Discarding: [♡J]
+> INFO:root:---- Total turn: 8, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♢A], [♢3], [♠4], [♡5], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW], [♣7]>
+> INFO:root:Discarding: [♣7]
+> INFO:root:---- Total turn: 9, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[♢2], [♣2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW], [♠Q]>
+> INFO:root:Discarding: [♠Q]
+> INFO:root:---- Total turn: 10, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♢A], [♢3], [♠4], [♡5], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW], [♣6]>
+> INFO:root:Discarding: [♣6]
+> INFO:root:---- Total turn: 11, Players turn: Abe
+> INFO:root:Drawing from top of deck
+> Abe : <[♢2], [♣2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW], [♡8]>
+> INFO:root:Discarding: [♡8]
+> INFO:root:---- Total turn: 12, Players turn: Brenna
+> INFO:root:Drawing from top of deck
+> Brenna : <[♢A], [♢3], [♠4], [♡5], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW], [♠A]>
+> INFO:root:Discarding: [♡5]
+> INFO:root:Brenna is out! Hand:
+> INFO:root:[[♢A], [ʷW], [♢3]]
+> INFO:root:[[♠A], [ʷW], [ʷW], [♠4]]
+> INFO:root:[[♣8], [♠8], [♢8]]
+> INFO:root:[[♣J], [♣J], [♢J]]
+> Abe : <[♢2], [♣2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW]>
+> Brenna : <[♢A], [♠A], [♢3], [♠4], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW]>
