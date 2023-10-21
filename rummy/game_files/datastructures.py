@@ -112,8 +112,9 @@ class Deck:
                     continue
                 for value in range(1,14):
                     self.cards.append(Card(suit, value))
-                for _ in range(0, 2):
-                    self.cards.append(Card(Suits.JOKER, 14))
+            for _ in range(0, 2):
+                self.cards.append(Card(Suits.JOKER, 14))
+        logging.info("Cards in deck: {}".format(len(self.cards)))
 
     def shuffle(self):
         random.shuffle(self.cards)
@@ -580,7 +581,7 @@ def check_go_out(hand, existing_groups=None):
                 cards_copy.remove(card)
         
         assert len(cards_copy) >= 1
-        cards_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
+        cards_copy.sort(key=lambda x: get_card_score(x, round))
         discard = cards_copy[len(cards_copy) - 1]
         
         # State invalidation.
@@ -629,3 +630,8 @@ def check_go_out(hand, existing_groups=None):
     # Card discard strategy, return the highest card with the least combinations
 
     # Add a <play off others> mechanic after.
+    """
+    Just take sets / runs from the table, find some way to mark them as "not mine"
+    put them into the sets function and runs function. Then when subtracting,
+    just don't subtract those cards from my hand.
+    """

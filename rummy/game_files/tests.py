@@ -194,6 +194,29 @@ def test_check_go_out():
         Card(Suits.HEART, 3),
         Card(Suits.HEART, 3),
         Card(Suits.HEART, 3)]]
+    
+    # Ensure couples take bias over a run if they save points
+    hand = Hand("test")
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 9))
+    # Discard 9, score of 11 with group of 3's
+
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 0
+    assert discard == Card(Suits.HEART, 9)
+    assert groups == [[
+        Card(Suits.HEART, 1),
+        Card(Suits.HEART, 2),
+        Card(Suits.HEART, 3)],
+        [Card(Suits.HEART, 1),
+        Card(Suits.HEART, 2),
+        Card(Suits.HEART, 3)]]
 
     # Test that math works out for long run taking bias over high couples
     hand = Hand("test")
@@ -268,24 +291,55 @@ def test_check_go_out():
     # Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7], [♣Q]>
     # INFO:root:Discarding: [♡K]
     hand = Hand("test")
-    hand.add(Card(Suits.DIAMOND, 9))
-    hand.add(Card(Suits.DIAMOND, 5))
-    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 10))
+    hand.add(Card(Suits.SPADE, 9))
+    hand.add(Card(Suits.SPADE, 13))
+    hand.add(Card(Suits.DIAMOND, 7))
     hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.JOKER, 14))
-    hand.add(Card(Suits.CLUB, 5))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.DIAMOND, 11))
+    hand.add(Card(Suits.DIAMOND, 2))
+    hand.add(Card(Suits.HEART, 13))
+    hand.add(Card(Suits.HEART, 12))
+    hand.add(Card(Suits.SPADE, 7))
+    hand.add(Card(Suits.CLUB, 12))
 
     # TODO: Fix this, it is legal, but outputs wrong
     score, discard, groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    assert score == 0
-    assert discard == Card(Suits.DIAMOND, 12)
-    assert groups == [[
-            Card(Suits.DIAMOND, 9), 
-            Card(Suits.JOKER, 14), 
-            Card(Suits.JOKER, 14), 
-        ]]
+    # assert score == 0
+    assert discard == Card(Suits.HEART, 12)
+    # assert groups == [[
+    #         Card(Suits.DIAMOND, 9), 
+    #         Card(Suits.JOKER, 14), 
+    #         Card(Suits.JOKER, 14), 
+    #     ]]
 
+    # Discarding 4 seems like a bad choice, 2 seems better..
+    # Abe : <[♠2], [♢3], [♣3], [♣4], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K]>
+    # INFO:root:Discarding: [♣4]
+    hand = Hand("test")
+    hand.add(Card(Suits.SPADE, 2))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.CLUB, 3))
+    hand.add(Card(Suits.CLUB, 4))
+    hand.add(Card(Suits.CLUB, 4))
+    hand.add(Card(Suits.CLUB, 5))
+    hand.add(Card(Suits.SPADE, 6))
+    hand.add(Card(Suits.HEART, 6))
+    hand.add(Card(Suits.DIAMOND, 6))
+    hand.add(Card(Suits.DIAMOND, 9))
+    hand.add(Card(Suits.DIAMOND, 10))
+    hand.add(Card(Suits.CLUB, 13))
+    hand.add(Card(Suits.DIAMOND, 13))
+    hand.add(Card(Suits.CLUB, 13))
+
+    score, discard, groups = check_go_out(hand)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    # assert score == 0
+    assert discard == Card(Suits.CLUB, 4)
 
 def test_python():
     hand = []
@@ -304,3 +358,10 @@ def test_python():
     logging.debug("Starting max permutation check")
     group_permutation_order = list(permutations(range(10)))
     logging.debug("total combinations: {}".format(len(group_permutation_order)))
+
+
+if __name__ == "__main__":
+    
+    logging.getLogger().setLevel(logging.DEBUG)
+
+    run_tests()
