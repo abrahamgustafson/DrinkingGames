@@ -24,6 +24,10 @@ class Round:
             raise Exception("Round must be between 3 and 13")
         if len(player_list) < 2:
             raise Exception("Must have at lest 2 players")
+        self.players_out = []
+        self.public_card_groups = []
+        self.player_to_hand_map = dict()
+        self.player_to_score_map = dict()
         self.next_player_index = round % len(player_list)
         print("Round {} beginning. First player: {}".format(round, player_list[self.next_player_index]))
         
@@ -81,10 +85,9 @@ class Round:
         """
         Returns true if the round is over, false if not
         """
+        logging.info("------------ Turn: {}, player: {} ------------".format(self.turn, self.get_next_player_name()))
         self.draw_from_deck()
         self.print_player_state()
-        logging.info("-------- Turn: {}, player: {}".format(self.turn, self.get_next_player_name()))
-        self.print_state()
 
 
         has_anyone_gone_out = len(self.players_out) > 0
@@ -105,6 +108,7 @@ class Round:
 
         # If there are public groups modified, that means someone has gone out. Update them.
         for public_group in public_groups_modified:
+            logging.debug("Public cards, fixed: {}.   total: {}".format(public_group.fixed_cards, public_group.total_group))
             assert public_group.fixed_cards in self.public_card_groups
             self.public_card_groups.remove(public_group.fixed_cards)
             self.public_card_groups.append(public_group.total_group)
@@ -126,6 +130,7 @@ class Round:
         Returns score map
         """
         round_over = False
+        self.print_state()
         while not round_over:
             round_over = self.play()
         return self.player_to_score_map
@@ -167,7 +172,7 @@ class Game:
 
 def run_script():
 
-    player_list = ["Abe", "Brenna"]
+    player_list = ["Abe", "Brenna", "CardBot", "Stinky"]
     game = Game(player_list, 2)
     # round = game.initialize_round(13)  # Tried going up to 5 and it crashed..
 
@@ -176,7 +181,7 @@ def run_script():
     # print(round.peek_discard())
 
     # Go to 14, doing a smaller number for a test
-    for round in range(3,5):
+    for round in range(3,14):
         game.play_round(round) 
 
     logging.info("Game over")
@@ -217,6 +222,7 @@ if __name__ == "__main__":
     #                     help='Name of file in DrinkingGames/rummy/datasets/')
     
     logging.getLogger().setLevel(logging.INFO)
+    # logging.getLogger().setLevel(logging.DEBUG)
 
     args = parser.parse_args()
     print(args)

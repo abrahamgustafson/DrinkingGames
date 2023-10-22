@@ -473,9 +473,9 @@ def get_all_sets(hand, round, existing_sets=None):
                 if card.value == needed_card_number:
                     cards_that_work.append(card)
             
-            logging.debug("length: {}, public_group_ref: {}, ongoing_set: {}, cards_that_work: {}".format(
-                length, public_group_ref, ongoing_set, cards_that_work
-            ))
+            # logging.debug("length: {}, public_group_ref: {}, ongoing_set: {}, cards_that_work: {}".format(
+            #     length, public_group_ref, ongoing_set, cards_that_work
+            # ))
             for card in cards_that_work:
                 ongoing_set_copy = copy.deepcopy(ongoing_set)
                 ongoing_set_copy.append(card)
@@ -763,7 +763,14 @@ def get_natural_outage_possibilities(round):
 
     return find_combinations(round, 3)
 
-def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups, global_loop_count):
+def recursive_scenario_solve(
+        group_order_so_far,
+        remaining_cards,
+        groups_left,
+        groups_reference,
+        truncated_groups,
+        global_loop_count,
+        consumed_public_groups = None):
     """
     Probably want to evaluate before pushing whether the selected next index works..
     That way the caller can decide to push itself as <end of a tree>
@@ -775,7 +782,13 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
         groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
         truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
         global_loop_count(list(int)): Incrementing int to see how deep each scenario goes. Used for optimizing.
+        consumed_public_groups(list(card)): List of cards that reference a public fixed group. If we play on one,
+                                            we can't play on it twice. That's why we evaluate all public run 
+                                            extensions up front. (EG, set of queens if we have 2 queens).
     """
+    if not consumed_public_groups:
+        consumed_public_groups = []
+
     # Should it add each time a group doesn't work..? or just if nothing works?
     # If it was [1,2,3,4], and we were at [1] with [2,3,4] left, 
     # at [1]->[2] [3,4] we would at least want to consider the [3,4] as next steps, or each would add [1]..
@@ -784,12 +797,17 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
     for group_idx in groups_left:
         group = groups_reference[group_idx]
 
+        is_public_group = False
         group_cards = []
+        all_cards_work = True
 
         # If this group is >= remaining_cards, that means we ignore it. Have to have a discard.
         if isinstance(group, PublicGroup):
             group_length = len(group.private_cards)
             group_cards = group.private_cards
+            is_public_group = True
+            if group.fixed_cards in consumed_public_groups:
+                all_cards_work = False
         else:
             group_length = len(group)
             group_cards = group
@@ -799,7 +817,6 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
 
         # Check to see if all cards are possible to remove, if they are, continue with this as viable.
         remaining_cards_copy = copy.deepcopy(remaining_cards)
-        all_cards_work = True
 
         
         for card in group_cards:
@@ -809,6 +826,9 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
                 all_cards_work = False
                 break
         if all_cards_work:
+            consumed_public_groups_copy = copy.deepcopy(consumed_public_groups)
+            if is_public_group:
+                consumed_public_groups_copy.append(group.fixed_cards)
             viable_next_indexes.append(group_idx)
             group_order_so_far_copy = copy.deepcopy(group_order_so_far)
             # groups_left_copy = copy.deepcopy(groups_left)
@@ -822,7 +842,8 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
                 groups_left[1:],
                 groups_reference,
                 truncated_groups,
-                global_loop_count)
+                global_loop_count,
+                consumed_public_groups_copy)
     
     # If no scenarios were viable to continue with, this is the end of a tree.
     if not viable_next_indexes:
@@ -856,11 +877,11 @@ def check_go_out(hand, existing_groups=None):
     for existing_group in existing_groups:
         is_set = is_valid_set(existing_group, round)
         is_run = is_valid_run(existing_group, round)
-        if is_set and is_run or is_run:
+        if is_set and is_run or is_set:
             existing_sets.append(existing_group)
             continue
-        if is_set:
-            existing_sets.append(existing_group)
+        if is_run:
+            existing_runs.append(existing_group)
             continue
         raise AssertionError("Exising group is not valid: {}".format(existing_group))
     
@@ -871,10 +892,9 @@ def check_go_out(hand, existing_groups=None):
     logging.debug("Getting all sets")
     sets, public_sets = get_all_sets(hand, round, existing_sets)
     
-    logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
-    logging.debug("Public Run options: {}, Public Set options: {}".format(len(public_runs), len(public_sets)))
-    # logging.debug(runs)
-    # logging.debug(sets)
+    # logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
+    # logging.debug("Public Run options: {}, Public Set options: {}".format(len(public_runs), len(public_sets)))
+    # logging.debug("\nSets: {}\nRuns: {}\nPublic Sets: {}\nPublic Runs: {}".format(sets,runs,public_sets,public_runs))
     groups = runs + sets
     public_groups = public_runs + public_sets
     combined_groups = groups + public_groups
@@ -915,8 +935,7 @@ def check_go_out(hand, existing_groups=None):
                 truncated_groups,
                 global_loop_count)
         
-    
-    logging.info("Done with recursive_scenario_solve. Total cycles: {}, truncated_groups lenth: {}".format(
+    logging.debug("Done with recursive_scenario_solve. Total cycles: {}, truncated_groups lenth: {}".format(
         global_loop_count, len(truncated_groups)))
         
     # Output result here is a list of viable orders

@@ -1,0 +1,1020 @@
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♠K]
+INFO:root:------------ Turn: 8, player: Brenna ------------
+Brenna : <[♠2], [♡3], [♠5], [♠9], [♠10], [♢A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♡3]
+INFO:root:------------ Turn: 9, player: Abe ------------
+Abe : <[♡4], [♡9], [♠9], [♡9], [ʷW], [♠4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [4], truncated_groups lenth: 4
+INFO:root:Discarding: [♠4]
+INFO:root:------------ Turn: 10, player: Brenna ------------
+Brenna : <[♢A], [♠2], [♠5], [♠9], [♠10], [♣A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♠2]
+INFO:root:------------ Turn: 11, player: Abe ------------
+Abe : <[♡4], [♡9], [♠9], [♡9], [ʷW], [♠J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [4], truncated_groups lenth: 4
+INFO:root:Discarding: [♠J]
+INFO:root:------------ Turn: 12, player: Brenna ------------
+Brenna : <[♢A], [♣A], [♠5], [♠9], [♠10], [♡7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♡7]
+INFO:root:------------ Turn: 13, player: Abe ------------
+Abe : <[♡4], [♡9], [♠9], [♡9], [ʷW], [♣J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♣J]
+INFO:root:------------ Turn: 14, player: Brenna ------------
+Brenna : <[♢A], [♣A], [♠5], [♠9], [♠10], [♡2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♡2]
+INFO:root:------------ Turn: 15, player: Abe ------------
+Abe : <[♡4], [♡9], [♠9], [♡9], [ʷW], [♡K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♡K]
+INFO:root:------------ Turn: 16, player: Brenna ------------
+Brenna : <[♢A], [♣A], [♠5], [♠9], [♠10], [♢7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♢7]
+INFO:root:------------ Turn: 17, player: Abe ------------
+Abe : <[♡4], [♡9], [♠9], [♡9], [ʷW], [♣5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [12], truncated_groups lenth: 12
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♠9], [♡9], [♡9]]]
+INFO:root:Public cards:
+[[[♠9], [♡9], [♡9]]]
+INFO:root:Discarding: [♡4]
+INFO:root:------------ Turn: 18, player: Brenna ------------
+Brenna : <[♢A], [♣A], [♠5], [♠9], [♠10], [♢8]>
+DEBUG:root:Existing sets: 1, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [5], truncated_groups lenth: 3
+INFO:root:Score: 2, Hand: [[[♠9], [♠10], [♠5]]]
+INFO:root:Public cards:
+[[[♠9], [♡9], [♡9]]]
+INFO:root:Discarding: [♢8]
+INFO:root:======================= ROUND OVER  5 =======================
+INFO:root:Round 5 over, player scores:
+{'Abe': -10, 'Brenna': -2}
+Round 6 beginning. First player: Abe
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 6 =======================
+Abe : <[♡4], [♡7], [♠8], [♣7], [♠10], [♡3]>
+Brenna : <[♣5], [♠K], [♠J], [♣3], [♡6], [♡K]>
+INFO:root:------------ Turn: 0, player: Abe ------------
+Abe : <[♡4], [♡7], [♠8], [♣7], [♠10], [♡3], [♢A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♠10]
+INFO:root:------------ Turn: 1, player: Brenna ------------
+Brenna : <[♣5], [♠K], [♠J], [♣3], [♡6], [♡K], [♠4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [4], truncated_groups lenth: 4
+INFO:root:Discarding: [♡K]
+INFO:root:------------ Turn: 2, player: Abe ------------
+Abe : <[♢A], [♡3], [♡4], [♡7], [♣7], [♠8], [♢7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♠8]
+INFO:root:------------ Turn: 3, player: Brenna ------------
+Brenna : <[♣3], [♠4], [♣5], [♡6], [♠J], [♠K], [♣Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♣Q]
+INFO:root:------------ Turn: 4, player: Abe ------------
+Abe : <[♢A], [♡3], [♡4], [♡7], [♣7], [♢7], [♡A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♡4]
+INFO:root:------------ Turn: 5, player: Brenna ------------
+Brenna : <[♣3], [♠4], [♣5], [♡6], [♠J], [♠K], [♢A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♣5]
+INFO:root:------------ Turn: 6, player: Abe ------------
+Abe : <[♢A], [♡A], [♡3], [♡7], [♣7], [♢7], [♠9]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♠9]
+INFO:root:------------ Turn: 7, player: Brenna ------------
+Brenna : <[♢A], [♣3], [♠4], [♡6], [♠J], [♠K], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [12], truncated_groups lenth: 12
+INFO:root:Discarding: [♠4]
+INFO:root:------------ Turn: 8, player: Abe ------------
+Abe : <[♢A], [♡A], [♡3], [♡7], [♣7], [♢7], [♠Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♠Q]
+INFO:root:------------ Turn: 9, player: Brenna ------------
+Brenna : <[♢A], [♣3], [♡6], [♠J], [♠K], [ʷW], [♣3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [13], truncated_groups lenth: 13
+INFO:root:Discarding: [♣3]
+INFO:root:------------ Turn: 10, player: Abe ------------
+Abe : <[♢A], [♡A], [♡3], [♡7], [♣7], [♢7], [♣10]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♣10]
+INFO:root:------------ Turn: 11, player: Brenna ------------
+Brenna : <[♢A], [♣3], [♡6], [♠J], [♠K], [ʷW], [♣J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 14
+INFO:root:Discarding: [♣J]
+INFO:root:------------ Turn: 12, player: Abe ------------
+Abe : <[♢A], [♡A], [♡3], [♡7], [♣7], [♢7], [♠2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♡3]
+INFO:root:------------ Turn: 13, player: Brenna ------------
+Brenna : <[♢A], [♣3], [♡6], [♠J], [♠K], [ʷW], [♠A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 14
+INFO:root:Discarding: [♣3]
+INFO:root:------------ Turn: 14, player: Abe ------------
+Abe : <[♢A], [♡A], [♠2], [♡7], [♣7], [♢7], [♢2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♢2]
+INFO:root:------------ Turn: 15, player: Brenna ------------
+Brenna : <[♢A], [♠A], [♡6], [♠J], [♠K], [ʷW], [♢6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [24], truncated_groups lenth: 24
+INFO:root:Discarding: [♠A]
+INFO:root:------------ Turn: 16, player: Abe ------------
+Abe : <[♢A], [♡A], [♠2], [♡7], [♣7], [♢7], [♣4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♣4]
+INFO:root:------------ Turn: 17, player: Brenna ------------
+Brenna : <[♢A], [♡6], [♢6], [♠J], [♠K], [ʷW], [♢6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [22], truncated_groups lenth: 22
+INFO:root:First player to go out: Brenna
+INFO:root:Score: -5, Hand: [[[♠J], [ʷW], [♠K]]]
+INFO:root:Public cards:
+[[[♠J], [ʷW], [♠K]]]
+INFO:root:Discarding: [♢A]
+INFO:root:------------ Turn: 18, player: Abe ------------
+Abe : <[♢A], [♡A], [♠2], [♡7], [♣7], [♢7], [♣6]>
+DEBUG:root:Existing sets: 0, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [8], truncated_groups lenth: 7
+INFO:root:Score: 0, Hand: [[[♣6], [♡A], [♢A]], [[♣7], [♡7], [♢7]]]
+INFO:root:Public cards:
+[[[♠J], [ʷW], [♠K]]]
+INFO:root:Discarding: [♠2]
+INFO:root:======================= ROUND OVER  6 =======================
+INFO:root:Round 6 over, player scores:
+{'Abe': -10, 'Brenna': -7}
+Round 7 beginning. First player: Brenna
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 7 =======================
+Abe : <[♣10], [♠3], [♡4], [♡8], [♡6], [♢6], [♡Q]>
+Brenna : <[♡7], [♡2], [♣4], [♢2], [♠5], [♡J], [♠9]>
+INFO:root:------------ Turn: 0, player: Brenna ------------
+Brenna : <[♡7], [♡2], [♣4], [♢2], [♠5], [♡J], [♠9], [♣K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [2], truncated_groups lenth: 2
+INFO:root:Discarding: [♣K]
+INFO:root:------------ Turn: 1, player: Abe ------------
+Abe : <[♣10], [♠3], [♡4], [♡8], [♡6], [♢6], [♡Q], [♣8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♡Q]
+INFO:root:------------ Turn: 2, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♠5], [♡7], [♠9], [♡J], [♢5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♡J]
+INFO:root:------------ Turn: 3, player: Abe ------------
+Abe : <[♠3], [♡4], [♡6], [♢6], [♡8], [♣8], [♣10], [♠5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♣10]
+INFO:root:------------ Turn: 4, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♠5], [♢5], [♡7], [♠9], [♢Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♢Q]
+INFO:root:------------ Turn: 5, player: Abe ------------
+Abe : <[♠3], [♡4], [♠5], [♡6], [♢6], [♡8], [♣8], [♢6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♣8]
+INFO:root:------------ Turn: 6, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♠5], [♢5], [♡7], [♠9], [♢8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 3
+INFO:root:Discarding: [♠9]
+INFO:root:------------ Turn: 7, player: Abe ------------
+Abe : <[♠3], [♡4], [♠5], [♡6], [♢6], [♢6], [♡8], [♠A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♡8]
+INFO:root:------------ Turn: 8, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♠5], [♢5], [♡7], [♢8], [♢4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [7], truncated_groups lenth: 7
+INFO:root:Discarding: [♢8]
+INFO:root:------------ Turn: 9, player: Abe ------------
+Abe : <[♠A], [♠3], [♡4], [♠5], [♡6], [♢6], [♢6], [♠2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 2
+INFO:root:Discarding: [♠5]
+INFO:root:------------ Turn: 10, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♢4], [♠5], [♢5], [♡7], [♡6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [7], truncated_groups lenth: 7
+INFO:root:Discarding: [♡6]
+INFO:root:------------ Turn: 11, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡4], [♡6], [♢6], [♢6], [♠7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [21], truncated_groups lenth: 15
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♠A], [♠2], [♠3]], [[♡6], [♢6], [♢6]]]
+INFO:root:Public cards:
+[[[♠A], [♠2], [♠3]], [[♡6], [♢6], [♢6]]]
+INFO:root:Discarding: [♡4]
+INFO:root:------------ Turn: 12, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♣4], [♢4], [♠5], [♢5], [♡7], [♣J]>
+DEBUG:root:Existing sets: 1, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [8], truncated_groups lenth: 8
+INFO:root:Score: 11, Hand: [[[♢2], [♡7], [♢4], [♢5]]]
+INFO:root:Public cards:
+[[[♠A], [♠2], [♠3]], [[♡6], [♢6], [♢6]]]
+INFO:root:Discarding: [♣J]
+INFO:root:======================= ROUND OVER  7 =======================
+INFO:root:Round 7 over, player scores:
+{'Abe': -15, 'Brenna': 4}
+Round 8 beginning. First player: Abe
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 8 =======================
+Abe : <[♡A], [♡9], [♢Q], [♡4], [♠4], [♣6], [♣5], [♡6]>
+Brenna : <[♡J], [♢J], [♠10], [♣8], [♢6], [♡9], [♡10], [♡K]>
+INFO:root:------------ Turn: 0, player: Abe ------------
+Abe : <[♡A], [♡9], [♢Q], [♡4], [♠4], [♣6], [♣5], [♡6], [♣Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♣Q]
+INFO:root:------------ Turn: 1, player: Brenna ------------
+Brenna : <[♡J], [♢J], [♠10], [♣8], [♢6], [♡9], [♡10], [♡K], [♠8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [53], truncated_groups lenth: 44
+INFO:root:Discarding: [♡K]
+INFO:root:------------ Turn: 2, player: Abe ------------
+Abe : <[♡A], [♡4], [♠4], [♣5], [♣6], [♡6], [♡9], [♢Q], [♣A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♢Q]
+INFO:root:------------ Turn: 3, player: Brenna ------------
+Brenna : <[♢6], [♣8], [♠8], [♡9], [♠10], [♡10], [♡J], [♢J], [♡2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [44], truncated_groups lenth: 35
+INFO:root:Discarding: [♢J]
+INFO:root:------------ Turn: 4, player: Abe ------------
+Abe : <[♡A], [♣A], [♡4], [♠4], [♣5], [♣6], [♡6], [♡9], [♣9]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♣9]
+INFO:root:------------ Turn: 5, player: Brenna ------------
+Brenna : <[♡2], [♢6], [♣8], [♠8], [♡9], [♠10], [♡10], [♡J], [♢2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [48], truncated_groups lenth: 37
+INFO:root:Discarding: [♠10]
+INFO:root:------------ Turn: 6, player: Abe ------------
+Abe : <[♡A], [♣A], [♡4], [♠4], [♣5], [♣6], [♡6], [♡9], [♢8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [5], truncated_groups lenth: 5
+INFO:root:Discarding: [♡9]
+INFO:root:------------ Turn: 7, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♢6], [♣8], [♠8], [♡9], [♡10], [♡J], [♠7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [44], truncated_groups lenth: 33
+INFO:root:Discarding: [♠7]
+INFO:root:------------ Turn: 8, player: Abe ------------
+Abe : <[♡A], [♣A], [♡4], [♠4], [♣5], [♣6], [♡6], [♢8], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [25], truncated_groups lenth: 25
+INFO:root:Discarding: [♡6]
+INFO:root:------------ Turn: 9, player: Brenna ------------
+Brenna : <[♡2], [♢2], [♢6], [♣8], [♠8], [♡9], [♡10], [♡J], [♡Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [93], truncated_groups lenth: 78
+INFO:root:First player to go out: Brenna
+INFO:root:Score: -5, Hand: [[[♡9], [♡10], [♡J], [♡Q]], [[♠8], [♡2], [♢2]]]
+INFO:root:Public cards:
+[[[♡9], [♡10], [♡J], [♡Q]], [[♠8], [♡2], [♢2]]]
+INFO:root:Discarding: [♢6]
+INFO:root:------------ Turn: 10, player: Abe ------------
+Abe : <[♡A], [♣A], [♡4], [♠4], [♣5], [♣6], [♢8], [ʷW], [♢3]>
+DEBUG:root:Existing sets: 1, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [21], truncated_groups lenth: 21
+INFO:root:Score: 9, Hand: [[[♣5], [♣6], [ʷW]]]
+INFO:root:Public cards:
+[[[♡9], [♡10], [♡J], [♡Q]], [[♠8], [♡2], [♢2]]]
+INFO:root:Discarding: [♠4]
+INFO:root:======================= ROUND OVER  8 =======================
+INFO:root:Round 8 over, player scores:
+{'Abe': -6, 'Brenna': -1}
+Round 9 beginning. First player: Brenna
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 9 =======================
+Abe : <[ʷW], [♣K], [♠3], [♠5], [♡K], [♢6], [♣J], [♣8], [♣A]>
+Brenna : <[♣J], [♡4], [♢J], [♢Q], [♡6], [♣9], [♠8], [ʷW], [♡J]>
+INFO:root:------------ Turn: 0, player: Brenna ------------
+Brenna : <[♣J], [♡4], [♢J], [♢Q], [♡6], [♣9], [♠8], [ʷW], [♡J], [♠9]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [84], truncated_groups lenth: 64
+INFO:root:Discarding: [♢Q]
+INFO:root:------------ Turn: 1, player: Abe ------------
+Abe : <[ʷW], [♣K], [♠3], [♠5], [♡K], [♢6], [♣J], [♣8], [♣A], [♢K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [7], truncated_groups lenth: 6
+INFO:root:Discarding: [♣J]
+INFO:root:------------ Turn: 2, player: Brenna ------------
+Brenna : <[♡4], [♡6], [♠8], [♣9], [♠9], [♣J], [♢J], [♡J], [ʷW], [♡10]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [88], truncated_groups lenth: 67
+INFO:root:Discarding: [♠8]
+INFO:root:------------ Turn: 3, player: Abe ------------
+Abe : <[♣A], [♠3], [♠5], [♢6], [♣8], [♣K], [♡K], [♢K], [ʷW], [♢2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [6], truncated_groups lenth: 5
+INFO:root:Discarding: [♣8]
+INFO:root:------------ Turn: 4, player: Brenna ------------
+Brenna : <[♡4], [♡6], [♣9], [♠9], [♡10], [♣J], [♢J], [♡J], [ʷW], [♡7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [132], truncated_groups lenth: 99
+INFO:root:First player to go out: Brenna
+INFO:root:Score: -5, Hand: [[[♡4], [ʷW], [♡6], [♡7]], [[♣J], [♡J], [♢J]]]
+INFO:root:Public cards:
+[[[♡4], [ʷW], [♡6], [♡7]], [[♣J], [♡J], [♢J]]]
+INFO:root:Discarding: [♡10]
+INFO:root:------------ Turn: 5, player: Abe ------------
+Abe : <[♣A], [♢2], [♠3], [♠5], [♢6], [♣K], [♡K], [♢K], [ʷW], [♢K]>
+DEBUG:root:Existing sets: 1, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [9], truncated_groups lenth: 8
+INFO:root:Score: 3, Hand: [[[♠3], [ʷW], [♠5]], [[♣K], [♡K], [♢K], [♢K]]]
+INFO:root:Public cards:
+[[[♡4], [ʷW], [♡6], [♡7]], [[♣J], [♡J], [♢J]]]
+INFO:root:Discarding: [♢6]
+INFO:root:======================= ROUND OVER  9 =======================
+INFO:root:Round 9 over, player scores:
+{'Abe': -3, 'Brenna': -6}
+Round 10 beginning. First player: Abe
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 10 =======================
+Abe : <[♣10], [♣4], [♢10], [♡2], [♡J], [♠Q], [♡5], [♡A], [♣3], [♠8]>
+Brenna : <[♣K], [♠9], [♢6], [♢6], [♢8], [♣8], [♠3], [♠J], [♢9], [♡6]>
+INFO:root:------------ Turn: 0, player: Abe ------------
+Abe : <[♣10], [♣4], [♢10], [♡2], [♡J], [♠Q], [♡5], [♡A], [♣3], [♠8], [♣Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [27], truncated_groups lenth: 27
+INFO:root:Discarding: [♡J]
+INFO:root:------------ Turn: 1, player: Brenna ------------
+Brenna : <[♣K], [♠9], [♢6], [♢6], [♢8], [♣8], [♠3], [♠J], [♢9], [♡6], [♠3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♣K]
+INFO:root:------------ Turn: 2, player: Abe ------------
+Abe : <[♡A], [♡2], [♣3], [♣4], [♡5], [♠8], [♣10], [♢10], [♠Q], [♣Q], [♠A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [29], truncated_groups lenth: 29
+INFO:root:Discarding: [♠8]
+INFO:root:------------ Turn: 3, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♢6], [♢6], [♡6], [♢8], [♣8], [♠9], [♢9], [♠J], [♠4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♠J]
+INFO:root:------------ Turn: 4, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣4], [♡5], [♣10], [♢10], [♠Q], [♣Q], [♣8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [29], truncated_groups lenth: 29
+INFO:root:Discarding: [♣8]
+INFO:root:------------ Turn: 5, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♠4], [♢6], [♢6], [♡6], [♢8], [♣8], [♠9], [♢9], [♣5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♢9]
+INFO:root:------------ Turn: 6, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣4], [♡5], [♣10], [♢10], [♠Q], [♣Q], [♢5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [33], truncated_groups lenth: 33
+INFO:root:Discarding: [♢5]
+INFO:root:------------ Turn: 7, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♠4], [♣5], [♢6], [♢6], [♡6], [♢8], [♣8], [♠9], [♡3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [3], truncated_groups lenth: 2
+INFO:root:Discarding: [♠9]
+INFO:root:------------ Turn: 8, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣4], [♡5], [♣10], [♢10], [♠Q], [♣Q], [♡2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [31], truncated_groups lenth: 31
+INFO:root:Discarding: [♡5]
+INFO:root:------------ Turn: 9, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♢8], [♣8], [♡3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [6], truncated_groups lenth: 3
+INFO:root:Discarding: [♣8]
+INFO:root:------------ Turn: 10, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♡2], [♣3], [♣4], [♣10], [♢10], [♠Q], [♣Q], [♣10]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [240], truncated_groups lenth: 213
+INFO:root:Discarding: [♡2]
+INFO:root:------------ Turn: 11, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♢8], [♣6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♢8]
+INFO:root:------------ Turn: 12, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣4], [♣10], [♢10], [♣10], [♠Q], [♣Q], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [62], truncated_groups lenth: 62
+INFO:root:Discarding: [♣4]
+INFO:root:------------ Turn: 13, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♡9]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♡9]
+INFO:root:------------ Turn: 14, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣10], [♢10], [♣10], [♠Q], [♣Q], [ʷW], [♡K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [58], truncated_groups lenth: 58
+INFO:root:Discarding: [♡K]
+INFO:root:------------ Turn: 15, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♡7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♡7]
+INFO:root:------------ Turn: 16, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣10], [♢10], [♣10], [♠Q], [♣Q], [ʷW], [♢J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [58], truncated_groups lenth: 58
+INFO:root:Discarding: [♢J]
+INFO:root:------------ Turn: 17, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♢7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♢7]
+INFO:root:------------ Turn: 18, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣3], [♣10], [♢10], [♣10], [♠Q], [♣Q], [ʷW], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [70], truncated_groups lenth: 67
+INFO:root:Discarding: [♣3]
+INFO:root:------------ Turn: 19, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♢9]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♢9]
+INFO:root:------------ Turn: 20, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣10], [♢10], [♣10], [♠Q], [♣Q], [ʷW], [ʷW], [♣K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [78], truncated_groups lenth: 74
+INFO:root:Discarding: [♠Q]
+INFO:root:------------ Turn: 21, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♡Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♡Q]
+INFO:root:------------ Turn: 22, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣10], [♢10], [♣10], [♣Q], [♣K], [ʷW], [ʷW], [♠5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [69], truncated_groups lenth: 66
+INFO:root:Discarding: [♠5]
+INFO:root:------------ Turn: 23, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♡7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Discarding: [♡7]
+INFO:root:------------ Turn: 24, player: Abe ------------
+Abe : <[♡A], [♠A], [♡2], [♣10], [♢10], [♣10], [♣Q], [♣K], [ʷW], [ʷW], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [108], truncated_groups lenth: 92
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♡A], [♡2], [ʷW]], [[♣Q], [♣K], [ʷW]]]
+INFO:root:Public cards:
+[[[♡A], [♡2], [ʷW]], [[♣Q], [♣K], [ʷW]]]
+INFO:root:Discarding: [♠A]
+INFO:root:------------ Turn: 25, player: Brenna ------------
+Brenna : <[♠3], [♠3], [♡3], [♡3], [♠4], [♣5], [♢6], [♢6], [♡6], [♣6], [♡A]>
+DEBUG:root:Existing sets: 0, Existing runs: 2
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [14], truncated_groups lenth: 9
+INFO:root:Score: 5, Hand: [[[♠3], [♠3], [♡3], [♡3]], [[♣6], [♡6], [♢6], [♢6]]]
+INFO:root:Public cards:
+[[[♡A], [♡2], [ʷW]], [[♣Q], [♣K], [ʷW]]]
+INFO:root:Discarding: [♣5]
+INFO:root:======================= ROUND OVER  10 =======================
+INFO:root:Round 10 over, player scores:
+{'Abe': -8, 'Brenna': -1}
+Round 11 beginning. First player: Brenna
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 11 =======================
+Abe : <[♢8], [♢7], [ʷW], [♢5], [♠10], [♢2], [ʷW], [♢10], [♡Q], [♢6], [♠Q]>
+Brenna : <[♣9], [♣J], [♠K], [♢5], [♢7], [♣4], [♣2], [♣6], [♠7], [♡A], [♠3]>
+INFO:root:------------ Turn: 0, player: Brenna ------------
+Brenna : <[♣9], [♣J], [♠K], [♢5], [♢7], [♣4], [♣2], [♣6], [♠7], [♡A], [♠3], [♢K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [5], truncated_groups lenth: 5
+INFO:root:Discarding: [♣9]
+INFO:root:------------ Turn: 1, player: Abe ------------
+Abe : <[♢8], [♢7], [ʷW], [♢5], [♠10], [♢2], [ʷW], [♢10], [♡Q], [♢6], [♠Q], [♡K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [385], truncated_groups lenth: 310
+INFO:root:Discarding: [♢10]
+INFO:root:------------ Turn: 2, player: Brenna ------------
+Brenna : <[♡A], [♣2], [♠3], [♣4], [♢5], [♣6], [♢7], [♠7], [♣J], [♠K], [♢K], [♡8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [5], truncated_groups lenth: 5
+INFO:root:Discarding: [♡8]
+INFO:root:------------ Turn: 3, player: Abe ------------
+Abe : <[♢2], [♢5], [♢6], [♢7], [♢8], [♠10], [♡Q], [♠Q], [♡K], [ʷW], [ʷW], [♣Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [544], truncated_groups lenth: 385
+INFO:root:Discarding: [♣Q]
+INFO:root:------------ Turn: 4, player: Brenna ------------
+Brenna : <[♡A], [♣2], [♠3], [♣4], [♢5], [♣6], [♢7], [♠7], [♣J], [♠K], [♢K], [♣6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [7], truncated_groups lenth: 7
+INFO:root:Discarding: [♠7]
+INFO:root:------------ Turn: 5, player: Abe ------------
+Abe : <[♢2], [♢5], [♢6], [♢7], [♢8], [♠10], [♡Q], [♠Q], [♡K], [ʷW], [ʷW], [♠J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [374], truncated_groups lenth: 307
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♠10], [ʷW], [♠Q]], [[♡Q], [♡K], [ʷW]], [[♢5], [♢6], [♢7], [♢8]]]
+INFO:root:Public cards:
+[[[♠10], [ʷW], [♠Q]], [[♡Q], [♡K], [ʷW]], [[♢5], [♢6], [♢7], [♢8]]]
+INFO:root:Discarding: [♢2]
+INFO:root:------------ Turn: 6, player: Brenna ------------
+Brenna : <[♡A], [♣2], [♠3], [♣4], [♢5], [♣6], [♣6], [♢7], [♣J], [♠K], [♢K], [♠8]>
+DEBUG:root:Existing sets: 0, Existing runs: 3
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [20], truncated_groups lenth: 13
+INFO:root:Score: 30, Hand: [[[♢5], [♣J], [♢7]]]
+DEBUG:root:Public cards, fixed: [[♠10], [ʷW], [♠Q]].   total: [[♠10], [ʷW], [♠Q], [♠K]]
+INFO:root:Public cards:
+[[[♡Q], [♡K], [ʷW]], [[♢5], [♢6], [♢7], [♢8]], [[♠10], [ʷW], [♠Q], [♠K]]]
+INFO:root:Discarding: [♢K]
+INFO:root:======================= ROUND OVER  11 =======================
+INFO:root:Round 11 over, player scores:
+{'Abe': -13, 'Brenna': 29}
+Round 12 beginning. First player: Abe
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 12 =======================
+Abe : <[♠10], [♠2], [♢K], [♠3], [♡5], [♢6], [♡9], [♠A], [♣6], [ʷW], [♢J], [♢7]>
+Brenna : <[♠J], [♢A], [♡6], [♢10], [♣3], [♡8], [♢10], [♣Q], [♡A], [♠Q], [♠2], [♡2]>
+INFO:root:------------ Turn: 0, player: Abe ------------
+Abe : <[♠10], [♠2], [♢K], [♠3], [♡5], [♢6], [♡9], [♠A], [♣6], [ʷW], [♢J], [♢7], [♡K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [13], truncated_groups lenth: 12
+INFO:root:Discarding: [♡K]
+INFO:root:------------ Turn: 1, player: Brenna ------------
+Brenna : <[♠J], [♢A], [♡6], [♢10], [♣3], [♡8], [♢10], [♣Q], [♡A], [♠Q], [♠2], [♡2], [♣8]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [36], truncated_groups lenth: 36
+INFO:root:Discarding: [♠J]
+INFO:root:------------ Turn: 2, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡5], [♢6], [♣6], [♢7], [♡9], [♠10], [♢J], [♢K], [ʷW], [♣J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [13], truncated_groups lenth: 12
+INFO:root:Discarding: [♣J]
+INFO:root:------------ Turn: 3, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡6], [♡8], [♣8], [♢10], [♢10], [♣Q], [♠Q], [♣7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [38], truncated_groups lenth: 38
+INFO:root:Discarding: [♣8]
+INFO:root:------------ Turn: 4, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡5], [♢6], [♣6], [♢7], [♡9], [♠10], [♢J], [♢K], [ʷW], [♠5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [16], truncated_groups lenth: 15
+INFO:root:Discarding: [♠10]
+INFO:root:------------ Turn: 5, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡6], [♣7], [♡8], [♢10], [♢10], [♣Q], [♠Q], [♡4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [43], truncated_groups lenth: 43
+INFO:root:Discarding: [♢10]
+INFO:root:------------ Turn: 6, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡5], [♠5], [♢6], [♣6], [♢7], [♡9], [♢J], [♢K], [ʷW], [♣K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [18], truncated_groups lenth: 17
+INFO:root:Discarding: [♣K]
+INFO:root:------------ Turn: 7, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡4], [♡6], [♣7], [♡8], [♢10], [♣Q], [♠Q], [♢6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [44], truncated_groups lenth: 44
+INFO:root:Discarding: [♢10]
+INFO:root:------------ Turn: 8, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡5], [♠5], [♢6], [♣6], [♢7], [♡9], [♢J], [♢K], [ʷW], [♠6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [49], truncated_groups lenth: 35
+INFO:root:Discarding: [♡9]
+INFO:root:------------ Turn: 9, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡4], [♡6], [♢6], [♣7], [♡8], [♣Q], [♠Q], [♢4]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [49], truncated_groups lenth: 49
+INFO:root:Discarding: [♣7]
+INFO:root:------------ Turn: 10, player: Abe ------------
+Abe : <[♠A], [♠2], [♠3], [♡5], [♠5], [♢6], [♣6], [♠6], [♢7], [♢J], [♢K], [ʷW], [♣2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [52], truncated_groups lenth: 37
+INFO:root:Discarding: [♢7]
+INFO:root:------------ Turn: 11, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡4], [♢4], [♡6], [♢6], [♡8], [♣Q], [♠Q], [♢Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [98], truncated_groups lenth: 98
+INFO:root:Discarding: [♢6]
+INFO:root:------------ Turn: 12, player: Abe ------------
+Abe : <[♠A], [♠2], [♣2], [♠3], [♡5], [♠5], [♢6], [♣6], [♠6], [♢J], [♢K], [ʷW], [♢5]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [136], truncated_groups lenth: 77
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♠A], [♠2], [♠3]], [[♢J], [ʷW], [♢K]], [[♠5], [♡5], [♢5]], [[♣6], [♠6], [♢6]]]
+INFO:root:Public cards:
+[[[♠A], [♠2], [♠3]], [[♢J], [ʷW], [♢K]], [[♠5], [♡5], [♢5]], [[♣6], [♠6], [♢6]]]
+INFO:root:Discarding: [♣2]
+INFO:root:------------ Turn: 13, player: Brenna ------------
+Brenna : <[♢A], [♡A], [♠2], [♡2], [♣3], [♡4], [♢4], [♡6], [♡8], [♣Q], [♠Q], [♢Q], [♡10]>
+DEBUG:root:Existing sets: 2, Existing runs: 2
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [235], truncated_groups lenth: 164
+INFO:root:Score: 9, Hand: [[[♡4], [♢Q], [♡6], [♠Q], [♡8], [♣Q], [♡10]]]
+INFO:root:Public cards:
+[[[♠A], [♠2], [♠3]], [[♢J], [ʷW], [♢K]], [[♠5], [♡5], [♢5]], [[♣6], [♠6], [♢6]]]
+INFO:root:Discarding: [♢4]
+INFO:root:======================= ROUND OVER  12 =======================
+INFO:root:Round 12 over, player scores:
+{'Abe': -18, 'Brenna': 38}
+Round 13 beginning. First player: Brenna
+INFO:root:Cards in deck: 108
+INFO:root:======================= ROUND START 13 =======================
+Abe : <[♢3], [♢K], [♣6], [♣Q], [♣7], [ʷW], [♣5], [♣10], [♡2], [♣5], [♣9], [♡K], [♢8]>
+Brenna : <[♠Q], [♢9], [♠5], [♣A], [♡8], [♡2], [♠8], [♣3], [♡4], [♢4], [♢A], [♣Q], [♢7]>
+INFO:root:------------ Turn: 0, player: Brenna ------------
+Brenna : <[♠Q], [♢9], [♠5], [♣A], [♡8], [♡2], [♠8], [♣3], [♡4], [♢4], [♢A], [♣Q], [♢7], [♡7]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♣Q]
+INFO:root:------------ Turn: 1, player: Abe ------------
+Abe : <[♢3], [♢K], [♣6], [♣Q], [♣7], [ʷW], [♣5], [♣10], [♡2], [♣5], [♣9], [♡K], [♢8], [♠J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [355], truncated_groups lenth: 304
+INFO:root:Discarding: [♠J]
+INFO:root:------------ Turn: 2, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♡4], [♢4], [♠5], [♢7], [♡7], [♡8], [♠8], [♢9], [♠Q], [♠3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♠Q]
+INFO:root:------------ Turn: 3, player: Abe ------------
+Abe : <[♡2], [♢3], [♣5], [♣5], [♣6], [♣7], [♢8], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [♡A]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [370], truncated_groups lenth: 316
+INFO:root:Discarding: [♢8]
+INFO:root:------------ Turn: 4, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♠3], [♡4], [♢4], [♠5], [♢7], [♡7], [♡8], [♠8], [♢9], [♣10]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [0], truncated_groups lenth: 0
+INFO:root:Discarding: [♣10]
+INFO:root:------------ Turn: 5, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [673], truncated_groups lenth: 576
+INFO:root:Discarding: [♣5]
+INFO:root:------------ Turn: 6, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♠3], [♡4], [♢4], [♠5], [♢7], [♡7], [♡8], [♠8], [♢9], [♡6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1], truncated_groups lenth: 1
+INFO:root:Discarding: [♢9]
+INFO:root:------------ Turn: 7, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♠6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [386], truncated_groups lenth: 311
+INFO:root:Discarding: [♠6]
+INFO:root:------------ Turn: 8, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♠3], [♡4], [♢4], [♠5], [♡6], [♢7], [♡7], [♡8], [♠8], [♣K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [33], truncated_groups lenth: 24
+INFO:root:Discarding: [♠8]
+INFO:root:------------ Turn: 9, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♠Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [412], truncated_groups lenth: 325
+INFO:root:Discarding: [♠Q]
+INFO:root:------------ Turn: 10, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♠3], [♡4], [♢4], [♠5], [♡6], [♢7], [♡7], [♡8], [♣K], [♣3]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [90], truncated_groups lenth: 51
+INFO:root:Discarding: [♢7]
+INFO:root:------------ Turn: 11, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♢6]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [396], truncated_groups lenth: 318
+INFO:root:Discarding: [♢6]
+INFO:root:------------ Turn: 12, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣3], [♠3], [♣3], [♡4], [♢4], [♠5], [♡6], [♡7], [♡8], [♣K], [♣2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [151], truncated_groups lenth: 89
+INFO:root:Discarding: [♠5]
+INFO:root:------------ Turn: 13, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♢Q]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [415], truncated_groups lenth: 327
+INFO:root:Discarding: [♢Q]
+INFO:root:------------ Turn: 14, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣2], [♣3], [♠3], [♣3], [♡4], [♢4], [♡6], [♡7], [♡8], [♣K], [♢K]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [550], truncated_groups lenth: 332
+INFO:root:Discarding: [♢4]
+INFO:root:------------ Turn: 15, player: Abe ------------
+Abe : <[♡A], [♡2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♢2]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [493], truncated_groups lenth: 383
+INFO:root:Discarding: [♡2]
+INFO:root:------------ Turn: 16, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣2], [♣3], [♠3], [♣3], [♡4], [♡6], [♡7], [♡8], [♣K], [♢K], [♡J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [492], truncated_groups lenth: 301
+INFO:root:Discarding: [♡J]
+INFO:root:------------ Turn: 17, player: Abe ------------
+Abe : <[♡A], [♢2], [♢3], [♣5], [♣6], [♣7], [♣9], [♣10], [♣Q], [♢K], [♡K], [ʷW], [ʷW], [♣J]>
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [1688], truncated_groups lenth: 1248
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♢2], [♢3], [ʷW]], [[♣5], [♣6], [♣7]], [[♣9], [♣10], [♣J], [♣Q]]]
+INFO:root:Public cards:
+[[[♢2], [♢3], [ʷW]], [[♣5], [♣6], [♣7]], [[♣9], [♣10], [♣J], [♣Q]]]
+INFO:root:Discarding: [♡A]
+INFO:root:------------ Turn: 18, player: Brenna ------------
+Brenna : <[♣A], [♢A], [♡2], [♣2], [♣3], [♠3], [♣3], [♡4], [♡6], [♡7], [♡8], [♣K], [♢K], [♢3]>
+DEBUG:root:Existing sets: 0, Existing runs: 3
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [4391], truncated_groups lenth: 2480
+INFO:root:Score: 0, Hand: [[[♣A], [♣2], [♣3]], [[♡2], [♢K], [♡4]], [[♡6], [♡7], [♡8]], [[♣3], [♠3], [♢3]]]
+DEBUG:root:Public cards, fixed: [[♢2], [♢3], [ʷW]].   total: [[♢A], [♢2], [♢3], [ʷW]]
+INFO:root:Public cards:
+[[[♣5], [♣6], [♣7]], [[♣9], [♣10], [♣J], [♣Q]], [[♢A], [♢2], [♢3], [ʷW]]]
+INFO:root:Discarding: [♣K]
+INFO:root:======================= ROUND OVER  13 =======================
+INFO:root:Round 13 over, player scores:
+{'Abe': -23, 'Brenna': 38}
+INFO:root:Game over

@@ -305,3 +305,116 @@ DEBUG:root:Test Result: 2, [♣4], [[[♢3], [♣K], [♢K]], [[♣3], [♣4], [
 
 Benchmark before trying to reduce copies:
 28s
+
+
+INFO:root:Public cards:
+[[[♡7], [♡8], [♢10]], [[♣A], [♣2], [♣3], [♣4]], [[♠5], [♠5], [♢5]]]
+
+Brenna : <[♠A], [♣A], [♠2], [♣2], [♢7], [♢8], [♡10], [♣J], [♣Q], [♣K], [♡6]>
+INFO:root:Done with recursive_scenario_solve. Total cycles: [687], truncated_groups lenth: 312
+INFO:root:Score: 4, Hand: [[[♢7], [♢8], [♡10]], [[♣J], [♣Q], [♣K]]]
+
+Cards that were left, <[♠A], [♣A], [♠2], [♣2], [♡6]>
+Traceback (most recent call last):
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 228, in <module>
+    run_script()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 180, in run_script
+    game.play_round(round)
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 156, in play_round
+    player_score_map = self.active_round.play_until_round_over()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 130, in play_until_round_over
+    round_over = self.play()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 108, in play
+    assert public_group.fixed_cards in self.public_card_groups
+
+
+
+[[[♢A], [ʷW], [♣10]], [[♣6], [♣7], [♣8]], [[♣K], [♠K], [♢K]]]
+
+
+
+INFO:root:Score: -5, Hand: [[[♠7], [♠8], [ʷW]], [[♣2], [♡2], [♡2]], [[♣Q], [♠Q], [♢Q]]]
+INFO:root:Public cards:
+[[[♠7], [♠8], [ʷW]], [[♣2], [♡2], [♡2]], [[♣Q], [♠Q], [♢Q]]]
+INFO:root:Discarding: [♠4]
+INFO:root:------------ Turn: 21, player: Brenna ------------
+Brenna : <[♠A], [♡A], [♡A], [♠3], [♠3], [♣4], [♣5], [♡10], [♣Q], [♢Q], [♡J]>
+DEBUG:root:Existing sets: 2, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Getting Starting check_go_out. Run options: 2, Set options: 8
+DEBUG:root:Public Run options: 0, Public Set options: 3
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [176], truncated_groups lenth: 91
+INFO:root:Score: 6, Hand: [[[♣4], [♣5], [♡10]], [[♠A], [♡A], [♡A]]]
+DEBUG:root:Public cards, fixed: [[♣Q], [♠Q], [♢Q]].   total: [[♣Q], [♠Q], [♢Q], [♣Q]]
+DEBUG:root:Public cards, fixed: [[♣Q], [♠Q], [♢Q]].   total: [[♣Q], [♠Q], [♢Q], [♢Q]]
+Traceback (most recent call last):
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 230, in <module>
+    run_script()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 181, in run_script
+    game.play_round(round)
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 157, in play_round
+    player_score_map = self.active_round.play_until_round_over()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 131, in play_until_round_over
+    round_over = self.play()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 108, in play
+    assert public_group.fixed_cards in self.public_card_groups
+AssertionError
+
+SUBOPTIMAL OUTAGE: ---
+Should have been
+[4a], [2,2 + w], [9, w, j], discard 7
+
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♠A], [ʷW], [ʷW]], [[♣3], [♣4], [♣5]], [[♣7], [♣7], [♢7]]]
+INFO:root:Public cards:
+[[[♠A], [ʷW], [ʷW]], [[♣3], [♣4], [♣5]], [[♣7], [♣7], [♢7]]]
+INFO:root:Discarding: [♡2]
+INFO:root:------------ Turn: 11, player: Brenna ------------
+Brenna : <[♢A], [♠A], [♢A], [♣A], [♡2], [♢2], [♣9], [♢10], [♡10], [♣J], [♠7]>
+DEBUG:root:Existing sets: 2, Existing runs: 1
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Getting Starting check_go_out. Run options: 15, Set options: 33
+DEBUG:root:Public Run options: 1, Public Set options: 8
+DEBUG:root:Done with recursive_scenario_solve. Total cycles: [7124], truncated_groups lenth: 4568
+INFO:root:Score: 2, Hand: [[[♣9], [♡10], [♣J]], [[♠A], [♢A], [♢A]]]
+DEBUG:root:Public cards, fixed: [[♠A], [ʷW], [ʷW]].   total: [[♠A], [ʷW], [ʷW], [♣A]]
+DEBUG:root:Public cards, fixed: [[♣7], [♣7], [♢7]].   total: [[♣7], [♣7], [♢7], [♠7]]
+INFO:root:Public cards:
+[[[♣3], [♣4], [♣5]], [[♠A], [ʷW], [ʷW], [♣A]], [[♣7], [♣7], [♢7], [♠7]]]
+INFO:root:Discarding: [♢2]
+INFO:root:======================= ROUND OVER  10 =======================
+INFO:root:Round 10 over, player scores:
+
+
+
+Hit another bug
+INFO:root:------------ Turn: 5, player: Abe ------------
+Abe : <[♠3], [♢4], [♢5], [♡6], [♣6], [♢7], [♢9], [♢6]>
+INFO:root:Discarding: [♢9]
+INFO:root:------------ Turn: 6, player: Brenna ------------
+Brenna : <[♠A], [♠A], [♣3], [♣3], [♡4], [♠6], [♡6], [♡10]>
+INFO:root:Discarding: [♡10]
+INFO:root:------------ Turn: 7, player: Abe ------------
+Abe : <[♠3], [♢4], [♢5], [♡6], [♣6], [♢6], [♢7], [♢2]>
+INFO:root:First player to go out: Abe
+INFO:root:Score: -5, Hand: [[[♢2], [♢7], [♢4], [♢5]], [[♣6], [♡6], [♢6]]]
+INFO:root:Public cards:
+[[[♢2], [♢7], [♢4], [♢5]], [[♣6], [♡6], [♢6]]]
+INFO:root:Discarding: [♠3]
+INFO:root:------------ Turn: 8, player: Brenna ------------
+Brenna : <[♠A], [♠A], [♣3], [♣3], [♡4], [♠6], [♡6], [♡Q]>
+INFO:root:Score: 12, Hand: []
+Traceback (most recent call last):
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 234, in <module>
+    run_script()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 185, in run_script
+    game.play_round(round)
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 161, in play_round
+    player_score_map = self.active_round.play_until_round_over()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 135, in play_until_round_over
+    round_over = self.play()
+  File "C:\projects\DrinkingGames\DrinkingGames\rummy\game_files\game.py", line 112, in play
+    assert public_group.fixed_cards in self.public_card_groups
+AssertionError
