@@ -284,7 +284,7 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 8
     assert discard == Card(Suits.HEART, 9)
@@ -292,6 +292,34 @@ def test_check_go_out():
         Card(Suits.HEART, 1),
         Card(Suits.HEART, 2),
         Card(Suits.HEART, 3)]]
+    
+    # Trivial public card group
+    hand = Hand("test")
+    hand.add(Card(Suits.HEART, 7))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.DIAMOND, 11))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.CLUB, 1))
+    hand.add(Card(Suits.CLUB, 1))
+    hand.add(Card(Suits.HEART, 1))
+
+    existing_groups = [
+        [Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)],
+        [Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)]
+    ]
+
+    expected_groups = [
+        [Card(Suits.CLUB, 1), Card(Suits.CLUB, 1), Card(Suits.HEART, 1)]]
+
+    score, discard, groups, public_groups = check_go_out(hand, existing_groups)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 13
+    assert discard == Card(Suits.DIAMOND, 12)
+    assert groups == expected_groups
+    assert len(public_groups) == 1
+    assert public_groups[0].fixed_cards == existing_groups[0]
+    existing_groups[0].append(Card(Suits.HEART, 7))
+    assert existing_groups[0] == public_groups[0].total_group
 
     # Ensure couples take bias over a run if they save points
     hand = Hand("test")
@@ -304,7 +332,7 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 11 with group of 3's
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 11
     assert discard == Card(Suits.HEART, 9)
@@ -324,7 +352,7 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 11 with group of 3's
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 0
     assert discard == Card(Suits.HEART, 9)
@@ -347,7 +375,7 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 10 with run of 1,2,3
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 10
     assert discard == Card(Suits.HEART, 9)
@@ -363,7 +391,7 @@ def test_check_go_out():
     hand.add(Card(Suits.CLUB, 11))
     hand.add(Card(Suits.CLUB, 5))
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 6
     assert discard == Card(Suits.CLUB, 11)
@@ -376,7 +404,7 @@ def test_check_go_out():
     hand.add(Card(Suits.CLUB, 6))
     hand.add(Card(Suits.JOKER, 14))
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 0
     assert discard == Card(Suits.CLUB, 6)
@@ -396,7 +424,7 @@ def test_check_go_out():
     hand.add(Card(Suits.CLUB, 5))
 
     # TODO: Fix this, it is legal, but outputs wrong
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 0
     assert discard == Card(Suits.DIAMOND, 12)
@@ -425,7 +453,7 @@ def test_check_go_out():
     hand.add(Card(Suits.CLUB, 12))
 
     # TODO: Fix this, it is legal, but outputs wrong
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     # assert score == 0
     assert discard == Card(Suits.HEART, 12)
@@ -454,7 +482,7 @@ def test_check_go_out():
     hand.add(Card(Suits.DIAMOND, 13))
     hand.add(Card(Suits.CLUB, 13))
 
-    score, discard, groups = check_go_out(hand)
+    score, discard, groups, public_groups = check_go_out(hand)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     # assert score == 0
     assert discard == Card(Suits.CLUB, 4)

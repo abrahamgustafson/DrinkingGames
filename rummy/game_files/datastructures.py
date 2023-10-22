@@ -238,6 +238,7 @@ class Group:
 class PublicGroup:
     total_group = None
     fixed_cards = None
+    private_cards = None
     
     def __init__(self, total_group, fixed_cards):
         """
@@ -248,6 +249,9 @@ class PublicGroup:
         """
         self.total_group = total_group
         self.fixed_cards = fixed_cards
+        self.private_cards = copy.deepcopy(total_group)
+        for card in fixed_cards:
+            self.private_cards.remove(card)
 
     def __str__(self):
         return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
@@ -259,6 +263,7 @@ class PublicGroup:
         if isinstance(other, PublicGroup):
             return self.total_group == other.total_group and self.fixed_cards == other.fixed_cards
         return False
+    
 
     
 def get_card_score(card, round):
@@ -779,14 +784,25 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
     for group_idx in groups_left:
         group = groups_reference[group_idx]
 
+        group_cards = []
+
         # If this group is >= remaining_cards, that means we ignore it. Have to have a discard.
-        if len(group) >= len(remaining_cards):
+        if isinstance(group, PublicGroup):
+            group_length = len(group.private_cards)
+            group_cards = group.private_cards
+        else:
+            group_length = len(group)
+            group_cards = group
+
+        if group_length >= len(remaining_cards):
             continue
 
         # Check to see if all cards are possible to remove, if they are, continue with this as viable.
         remaining_cards_copy = copy.deepcopy(remaining_cards)
         all_cards_work = True
-        for card in group:
+
+        
+        for card in group_cards:
             if card in remaining_cards_copy:
                 remaining_cards_copy.remove(card)
             else:
@@ -815,22 +831,6 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
         
         # truncated_groups.append(group_order_so_far)
 
-
-def recursive_scenario_solve_with_public(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups, groups_with_public_cards):
-    """
-    Probably want to evaluate before pushing whether the selected next index works..
-    That way the caller can decide to push itself as <end of a tree>
-    
-    Args:
-        group_order_so_far(list(idx)): List of indexes selected in this path (relative to the groups_reference)
-        remaining_cards(list(Card)): List of cards left in the hand
-        groups_left(list(idx)): List of indexes left unselected in this path (relative to the groups_reference)
-        groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
-        truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
-        public_groups_reference_(list(PublicGroup)): List of all public groups
-    """
-    
-
 def check_go_out(hand, existing_groups=None):
     """
     Check if you can go out. 
@@ -842,7 +842,8 @@ def check_go_out(hand, existing_groups=None):
     Returns:
         score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
         discard(Card): popped off the hand
-        Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
+        card_groups(list(list(Card))): List of card groups we would go out with (if we were going out first)
+        public_card_groups(list(PublicGroup)): List of PublicGroups we modified to go out
     """
     if not existing_groups:
         existing_groups = list()
@@ -874,16 +875,17 @@ def check_go_out(hand, existing_groups=None):
     logging.debug("Public Run options: {}, Public Set options: {}".format(len(public_runs), len(public_sets)))
     # logging.debug(runs)
     # logging.debug(sets)
-    combined_groups = runs + sets
-    combined_public_groups = public_runs + public_sets
+    groups = runs + sets
+    public_groups = public_runs + public_sets
+    combined_groups = groups + public_groups
 
     
     # TODO: Get good at python...
-    group_indexes = []
+    combined_group_indexes = []
     for idx, _ in enumerate(combined_groups):
-        group_indexes.append(idx)
+        combined_group_indexes.append(idx)
 
-    # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
+    # List(list(idx)): List of "groups" where each value in a group is an index ref to groups
     truncated_groups = []
 
     # Starter loop, we try each one as the starter..
@@ -894,17 +896,21 @@ def check_go_out(hand, existing_groups=None):
         cards_copy = copy.deepcopy(hand.cards)
 
         # Should be impossible to have a group that doesn't work, blindly remove.
-        for card in group:
-            cards_copy.remove(card)
+        if isinstance(group, PublicGroup):
+            for card in group.private_cards:   
+                cards_copy.remove(card)
+        else:
+            for card in group:
+                cards_copy.remove(card)
         
-        groups_left = copy.deepcopy(group_indexes)
+        groups_left = copy.deepcopy(combined_group_indexes)
         groups_left.remove(idx)
 
         recursive_scenario_solve(
                 group_order_so_far,
                 cards_copy,
                 # groups_left,
-                group_indexes[1:],
+                combined_group_indexes[1:],
                 combined_groups,
                 truncated_groups,
                 global_loop_count)
@@ -914,74 +920,33 @@ def check_go_out(hand, existing_groups=None):
         global_loop_count, len(truncated_groups)))
         
     # Output result here is a list of viable orders
-        
-    """
-    Trying to figure out how to do the calculations on public sets and runs:
-
-    1) [ ] Could just throw it straight into the recursive scenario solver
-        - How do I avoid completely nuking the permutations? 
-            1) Use the same heuristic (cutting trees short if they are impossible)
-            2) Save these for the end (but have their orders randomized). N + M versus N * M? 
-    2) [x] Could only calculate if we can't go out naturally...
-        That only helps the best case, and going back through would have to re-do the other 
-        scenario's anyways
-    3) Do two different strategies. One for normal hands, one for going out hands.
-        Normal hands: do what we do now
-        Going out hands: 
-            - go through the nomal loop
-                - If naturally 0 without using <public groups>, return early and play
-                - If not a natural 0, try filling in permutations of public groups in the same recursive pattern
-                    - If naturally 0, return early and play it
-        This will actually still be greedy and potentially suboptimal..
-    """
-    # TODO: Check if there are any 0 point combinations before doing this...
-
-    # TODO: Get good at python...
-    # group_indexes = []
-    # for idx, _ in enumerate(combined_groups):
-    #     group_indexes.append(idx)
-
-    # # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
-    # truncated_public_groups = []
-
-    # # Starter loop, we try each one as the starter..
-    # for idx, group in enumerate(combined_groups):
-    #     # Should be impossible to have one of the starter groups not fit. Blind add them.
-    #     group_order_so_far = [idx]
-    #     cards_copy = copy.deepcopy(hand.cards)
-
-    #     # Should be impossible to have a group that doesn't work, blindly remove.
-    #     for card in group:
-    #         cards_copy.remove(card)
-        
-    #     groups_left = copy.deepcopy(group_indexes)
-    #     groups_left.remove(idx)
-
-    #     recursive_scenario_solve(
-    #             group_order_so_far,
-    #             cards_copy,
-    #             groups_left,
-    #             combined_groups,
-    #             truncated_groups)
-
-    # What I'm left with here: truncated_groups
-    # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
 
 
     # list(tuple(scenario_selection_group, discard, other_cards, score))
     outage_scenarios = []
+    first_to_go_out = len(existing_groups) == 0
 
     # Loop through each, select a discard, and calculate a score
+    # truncated_groups = list(list(group_indexes)) // group indexes in a scenario that reached the end.
     for truncated_group in truncated_groups:
-        card_groups = []
+        private_card_groups = []
+        public_card_groups = []
 
         for group_index in truncated_group:
-            card_groups.append(combined_groups[group_index])
+            group = combined_groups[group_index]
+            if isinstance(group, PublicGroup):
+                public_card_groups.append(group)
+            else:
+                private_card_groups.append(group)
         
         cards_copy = copy.deepcopy(hand.cards)
-        for group in card_groups:
+        for group in private_card_groups:
             for card in group:
                 cards_copy.remove(card)
+        for group in public_card_groups:
+            for card in group.private_cards:
+                cards_copy.remove(card)
+        
         
         assert len(cards_copy) >= 1
         cards_copy.sort(key=lambda x: get_card_score(x, round))
@@ -990,15 +955,21 @@ def check_go_out(hand, existing_groups=None):
         # State invalidation.
         # It's viable to discard a wild IFF you are going out
         # if len(cards_copy) > 1:
-        #     assert not is_wild(discard, round)
-        
+        #     assert not is_wild(discard, round)        
         cards_copy.remove(discard)
 
         scenario_score = 0
         for card in cards_copy:
             scenario_score += get_card_score(card, round)
 
-        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score))
+        if first_to_go_out and scenario_score == 0:
+            # First to go out gets -5
+            scenario_score -= 5
+            if len(hand.wilds(round)) == 0:
+                # If you go out first naturally, you get an additional -10
+                scenario_score -= 10
+
+        outage_scenarios.append((private_card_groups, discard, cards_copy, scenario_score, public_card_groups))
 
     # If there are no outage scenarios, we have jack shit... Make one with no groups
     if len(outage_scenarios) == 0:
@@ -1019,7 +990,7 @@ def check_go_out(hand, existing_groups=None):
         for card in cards_copy:
             scenario_score += get_card_score(card, round)
 
-        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score))
+        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score, []))
 
     # Sort by the lowest value...
     outage_scenarios.sort(key = lambda x: x[3]) 
@@ -1028,7 +999,7 @@ def check_go_out(hand, existing_groups=None):
     chosen_scenario = outage_scenarios[0]
     hand.remove(chosen_scenario[1])
 
-    return chosen_scenario[3], chosen_scenario[1], chosen_scenario[0]
+    return chosen_scenario[3], chosen_scenario[1], chosen_scenario[0], chosen_scenario[4]
 
     # Card discard strategy, return the highest card with the least combinations
 

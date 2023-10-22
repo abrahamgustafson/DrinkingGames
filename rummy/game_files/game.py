@@ -9,7 +9,11 @@ class Round:
     discard_pile = None
     player_to_hand_map = dict()
     next_player_index = 0
-
+    turn = 0
+    players_out = []
+    # Cards on the table that all can play on
+    public_card_groups = []
+    player_to_score_map = dict()
 
     def __init__(self, player_list, round, decks=2):
         """
@@ -20,8 +24,8 @@ class Round:
             raise Exception("Round must be between 3 and 13")
         if len(player_list) < 2:
             raise Exception("Must have at lest 2 players")
-        
-        print("Round {} beginning. First player: {}".format(round, player_list[0]))
+        self.next_player_index = round % len(player_list)
+        print("Round {} beginning. First player: {}".format(round, player_list[self.next_player_index]))
         
         self.player_list = player_list
         self.deck = Deck(decks)
@@ -51,6 +55,7 @@ class Round:
         return self.player_list[self.next_player_index]
     
     def next_turn(self):
+        self.turn += 1
         if self.next_player_index + 1 >= len(self.player_list):
             self.next_player_index = 0
         else:
@@ -72,6 +77,60 @@ class Round:
     def discard(self, card):
         self.discard_pile.add(card)
 
+    def play(self):
+        """
+        Returns true if the round is over, false if not
+        """
+        self.draw_from_deck()
+        self.print_player_state()
+        logging.info("-------- Turn: {}, player: {}".format(self.turn, self.get_next_player_name()))
+        self.print_state()
+
+
+        has_anyone_gone_out = len(self.players_out) > 0
+        score, discard, groups, public_groups_modified = check_go_out(self.get_player_hand(), self.public_card_groups)
+
+        first_to_go_out = score <= 0 and not has_anyone_gone_out
+        
+
+        if first_to_go_out:
+            logging.info("First player to go out: {}".format(self.get_next_player_name()))
+            self.public_card_groups = groups
+
+        # We are out either way in this case.
+        if has_anyone_gone_out or first_to_go_out:
+            logging.info("Score: {}, Hand: {}".format(score, groups))
+            self.players_out.append(self.get_next_player())
+            self.player_to_score_map[self.get_next_player_name()] = score
+
+        # If there are public groups modified, that means someone has gone out. Update them.
+        for public_group in public_groups_modified:
+            assert public_group.fixed_cards in self.public_card_groups
+            self.public_card_groups.remove(public_group.fixed_cards)
+            self.public_card_groups.append(public_group.total_group)
+        if len(self.public_card_groups) > 0:
+            logging.info("Public cards:\n{}".format(self.public_card_groups))
+        
+        
+        logging.info("Discarding: {}".format(discard))
+        self.discard(discard)
+
+        if len(self.players_out) >= len(self.player_list):
+            return True
+            
+        self.next_turn()
+        return False
+    
+    def play_until_round_over(self):
+        """
+        Returns score map
+        """
+        round_over = False
+        while not round_over:
+            round_over = self.play()
+        return self.player_to_score_map
+
+
 
 class Game:
     player_list = None
@@ -90,50 +149,37 @@ class Game:
         for player in player_list:
             self.player_score_map[player] = 0
 
-    def initialize_round(self, round):
+    def play_round(self, round):
         # Todo, rotate next starter...
         self.active_round = Round(self.player_list, round, self.decks)
-        return self.active_round
+        logging.info("======================= ROUND START {} =======================".format(round))
+        player_score_map = self.active_round.play_until_round_over()
+        for player, score in player_score_map.items():
+            if player not in self.player_score_map:
+                self.player_score_map[player] = score
+            else:
+                self.player_score_map[player] += score
+
+        logging.info("======================= ROUND OVER  {} =======================".format(round))
+        logging.info("Round {} over, player scores:\n{}".format(round, self.player_score_map))   
+    
     
 
 def run_script():
 
     player_list = ["Abe", "Brenna"]
     game = Game(player_list, 2)
-    round = game.initialize_round(13)  # Tried going up to 5 and it crashed..
+    # round = game.initialize_round(13)  # Tried going up to 5 and it crashed..
 
-    # print("Player hands:\n{}".format(round.player_to_hand_map))
-    round.print_state()
+    # # print("Player hands:\n{}".format(round.player_to_hand_map))
+    # round.print_state()
     # print(round.peek_discard())
 
-    player_out = False
-    turn = 0
-    while not player_out:
-        turn += 1
-        logging.info("---- Total turn: {}, Players turn: {}".format(turn, round.get_next_player_name()))
-        logging.info("Drawing from top of deck")
-        round.draw_from_deck()
-        round.print_player_state()
+    # Go to 14, doing a smaller number for a test
+    for round in range(3,5):
+        game.play_round(round) 
 
-        # score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
-        # discard(Card): popped off the hand
-        # Groups(List(List(Card))): List of list of cards we would go out with (if this were the round to go out)
-        score, discard, groups = check_go_out(round.get_player_hand())
-
-        logging.info("Discarding: {}".format(discard))
-        round.discard(discard)
-
-        if score <= 0:
-            player_out = True
-            logging.info("{} is out! Hand:".format(round.get_next_player_name()))
-            for group in groups:
-                logging.info(group)
-
-
-        round.next_turn()
-
-    round.print_state()
-
+    logging.info("Game over")
     # try_go_out(round.player_to_hand_map["Abe"], 3)
     
 
