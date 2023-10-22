@@ -278,8 +278,38 @@ def is_valid_group(card_list, round):
 
     return True
 
+def is_valid_run(group, round):
+    """
+    Check if this group is a valid run.
+    Assumes the cards are sorted..
+    """
+    last_non_wild_idx = -1
+    for idx, card in enumerate(group):
+        if not is_wild(card, round):
+            if last_non_wild_idx >= 0:
+                last_card = group[last_non_wild_idx]
+                if last_card.suit != card.suit or (last_card.value + idx - last_non_wild_idx) != card.value:
+                    return False
+            last_non_wild_idx = idx
+    return True
+    
+def is_valid_set(group, round):
+    """
+    Check if this group is a valid set.
+    """
+    # If all cards are wild, it technically is a valid run..
+    # [3h, w, 5h]  0, 2
+    last_non_wild_idx = -1
+    for idx, card in enumerate(group):
+        if not is_wild(card, round):
+            if last_non_wild_idx >= 0:
+                last_card = group[last_non_wild_idx]
+                if last_card.value != card.value:
+                    return False
+            last_non_wild_idx = idx
+    return True
 
-def get_all_sets(hand, round):
+def get_all_sets(hand, round, existing_sets=None):
     """
     if input is [3,3,4], return []
     
@@ -287,6 +317,8 @@ def get_all_sets(hand, round):
 
     Sets are duplicates of the same card including wilds
     """
+    if not existing_sets:
+        existing_sets = []
     
     groups = []
     non_wild_cards = hand.sorted_cards_minus_wilds(round)
@@ -345,6 +377,65 @@ def get_all_sets(hand, round):
             recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_set_len, groups)
         return
 
+    def recurse_existing_set_extensions(ongoing_set, non_wilds, length, public_groups, public_group_ref):
+        """
+        Args:
+            ongoing_set(list(Card)): List of cards in the run, (EG, starting would be [4h])
+            non_wilds(list(Card)): Non wild cards, immutable
+            desired_run_len
+        Return when options exhausted
+        """
+        
+        # Base case where we add
+        # ASSUMED TO NOT START WITH 0,
+        if length == 0:
+            # I have something wrong here -- given that I can generate the same thing more than once.
+            # For the time being though, just going to ignore it, as long as this function is quick.
+            
+            # Sort the cards we added, just so we don't add duplicates
+            i = len(public_group_ref)
+            j = len(ongoing_set)
+            ongoing_set[i:j] = sorted(ongoing_set[i:j], key=lambda x: x.suit)
+            public_group = PublicGroup(ongoing_set, public_group_ref)
+            if public_group not in public_groups:
+                public_groups.append(PublicGroup(ongoing_set, public_group_ref))
+            return
+            
+        if length > 0:
+            # Don't use wilds, it doesn't make sense
+            first_non_wild = None
+
+            for card in ongoing_set:
+                if not is_wild(card, round):
+                    first_non_wild = card
+                    break
+            
+            if not first_non_wild:
+                raise AssertionError("Should not be possible to have a set of all wilds {}".format(ongoing_set))
+
+            needed_card_number = first_non_wild.value
+            cards_that_work = []
+
+            for card in non_wilds:
+                if card.value == needed_card_number:
+                    cards_that_work.append(card)
+            
+            logging.debug("length: {}, public_group_ref: {}, ongoing_set: {}, cards_that_work: {}".format(
+                length, public_group_ref, ongoing_set, cards_that_work
+            ))
+            for card in cards_that_work:
+                ongoing_set_copy = copy.deepcopy(ongoing_set)
+                ongoing_set_copy.append(card)
+                non_wilds_copy = copy.deepcopy(non_wilds)
+                non_wilds_copy.remove(card)
+                # Don't actually have to remove the card, because we won't be looking for it again.
+                recurse_existing_set_extensions(
+                    ongoing_set_copy,
+                    non_wilds_copy,
+                    length - 1,
+                    public_groups,
+                    public_group_ref)
+
 
     # For round 3 (4 cards with discard) loop once...
     for set_length in range(3, len(hand.cards)):
@@ -358,15 +449,83 @@ def get_all_sets(hand, round):
             non_wild_cards_copy_copy.remove(starting_card)
             # Safe to pass wilds, it will copy before we remove..
             recurse_until_options_exhausted(starting_set_group, non_wild_cards_copy_copy, wilds, set_length, groups)
+
+    # list of PublicGroup's (Extensions of existing runs)
+    # [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
+    public_groups = []
+
+    # Logically there is no reason to put down a card on an existing set if you have 3 of them.
+    # Only look through adding 1 or 2 cards to an existing set as a result..
+    for existing_set in existing_sets:
+        for additions in range(1, 3):
+            non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards)
             
-    return groups
+            recurse_existing_set_extensions(
+                existing_set,
+                non_wild_cards_copy_copy,
+                additions,
+                public_groups,
+                existing_set)
+            
+    return groups, public_groups
 
+class Group:
+    cards = None
+    # These cards are not ours.
+    public_group = None
 
-def get_all_runs(hand, round):
+    def __init__(self, public_group=None):
+        """
+        Args:
+            public_group(List(Card)): Existing group to play off which isn't ours.
+                                      EG, [1h,2h,3h]
+        """
+        if not public_group:
+            self.public_group = []
+        else:
+            self.public_group = public_group
+        
+        self.cards = public_group
+    
+    def append(self, card):
+        self.cards.append(card)
+
+class PublicGroup:
+    total_group = None
+    fixed_cards = None
+    
+    def __init__(self, total_group, fixed_cards):
+        """
+        ([1h,2h*,3h*,4h*] -> [1h,2h*,3h*,4h*])
+        Args:
+            total_group(list(Card)): List of cards in the group, including addons.
+            fixed_cards(list(Card)): List of cards in the public group, excluding addons.
+        """
+        self.total_group = total_group
+        self.fixed_cards = fixed_cards
+
+    def __str__(self):
+        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+    
+    def __repr__(self):
+        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+    
+    def __eq__(self, other):
+        if isinstance(other, PublicGroup):
+            return self.total_group == other.total_group and self.fixed_cards == other.fixed_cards
+        return False
+    
+
+def get_all_runs(hand, round, existing_runs=None):
     """
-    if input is [3h,3d,4h], return [[3h,4h],[3d]]
     Runs are incrementing values of the same suit (excluding wilds)
+
+    Could return:
+        all_my_runs = [[1h,2h,3h],[...]]
+        all_public_runs = [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
     """
+    if not existing_runs:
+        existing_runs = []
     
     groups = []
     non_wild_cards = hand.sorted_cards_minus_wilds(round)
@@ -418,6 +577,130 @@ def get_all_runs(hand, round):
             temp_run.append(temp_available_wilds.pop())
             recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_run_len, groups)
         return
+    
+        # existing_run, non_wild_cards_copy_copy, wilds, left_length, right_length, public_groups
+    def recurse_existing_run_extensions(ongoing_run, non_wilds, available_wilds, left_length, right_length, public_groups, public_group_ref):
+        """
+        Args:
+            ongoing_run(list(Card)): List of cards in the run, (EG, starting would be [4h])
+            non_wilds(list(Card)): Non wild cards, immutable
+            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
+            desired_run_len
+        Return when options exhausted
+        """
+        
+        # Base case where we add -- IFF left_length == 0 and right_length == 0
+        # ASSUMED TO NOT START WITH 0,0
+        if left_length == 0 and right_length == 0:
+            # I have something wrong here -- given that I can generate the same thing more than once.
+            # For the time being though, just going to ignore it, as long as this function is quick.
+            public_group = PublicGroup(ongoing_run, public_group_ref)
+            if public_group not in public_groups:
+                public_groups.append(PublicGroup(ongoing_run, public_group_ref))
+            return
+            
+        if left_length > 0:
+            # Try to add a card to the left
+
+            # Don't use wilds at the end, it doesn't make sense
+            exclude_wilds = bool(left_length == 1)
+
+            index_of_first_non_wild = -1
+            first_non_wild = None
+
+            for idx, card in enumerate(ongoing_run):
+                if not is_wild(card, round):
+                    index_of_first_non_wild = idx
+                    first_non_wild = card
+                    break
+            
+            if not first_non_wild:
+                raise AssertionError("Should not be possible to have a run of all wilds, those are considered sets. {}".format(ongoing_run))
+
+            needed_card = Card(first_non_wild.suit, first_non_wild.value - (1 + index_of_first_non_wild))
+
+            card_exists = False
+            for card in non_wilds:
+                if card == needed_card:
+                    card_exists = True
+                    break
+            
+            if card_exists:
+                ongoing_run_copy = copy.deepcopy(ongoing_run)
+                ongoing_run_copy.insert(0, needed_card)
+                # Don't actually have to remove the card, because we won't be looking for it again.
+                recurse_existing_run_extensions(
+                    ongoing_run_copy,
+                    non_wilds,
+                    available_wilds,
+                    left_length - 1,
+                    right_length,
+                    public_groups,
+                    public_group_ref)
+
+            if not exclude_wilds and len(available_wilds) > 0:
+                ongoing_run_copy = copy.deepcopy(ongoing_run)
+                temp_available_wilds = copy.deepcopy(available_wilds)
+                ongoing_run_copy.insert(0, temp_available_wilds.pop())
+                recurse_existing_run_extensions(
+                    ongoing_run_copy,
+                    non_wilds,
+                    temp_available_wilds,
+                    left_length - 1,
+                    right_length,
+                    public_groups,
+                    public_group_ref)
+                
+        if right_length > 0:
+            # Try to add a card to the right
+
+            # Don't use wilds at the end, it doesn't make sense
+            exclude_wilds = bool(right_length == 1)
+
+            index_of_first_non_wild = -1
+            first_non_wild = None
+
+            for idx, card in enumerate(reversed(ongoing_run)):
+                if not is_wild(card, round):
+                    index_of_first_non_wild = idx
+                    first_non_wild = card
+                    break
+            
+            if not first_non_wild:
+                raise AssertionError("Should not be possible to have a run of all wilds, those are considered sets. {}".format(ongoing_run))
+
+            needed_card = Card(first_non_wild.suit, first_non_wild.value + (1 + index_of_first_non_wild))
+
+            card_exists = False
+            for card in non_wilds:
+                if card == needed_card:
+                    card_exists = True
+                    break
+            if card_exists:
+                ongoing_run_copy = copy.deepcopy(ongoing_run)
+                ongoing_run_copy.append(needed_card)
+                # Don't actually have to remove the card, because we won't be looking for it again.
+                recurse_existing_run_extensions(
+                    ongoing_run_copy,
+                    non_wilds,
+                    available_wilds,
+                    left_length,
+                    right_length - 1,
+                    public_groups,
+                    public_group_ref)
+
+            if not exclude_wilds and len(available_wilds) > 0:
+                ongoing_run_copy = copy.deepcopy(ongoing_run)
+                temp_available_wilds = copy.deepcopy(available_wilds)
+                ongoing_run_copy.append(temp_available_wilds.pop())
+                recurse_existing_run_extensions(
+                    ongoing_run_copy,
+                    non_wilds,
+                    temp_available_wilds,
+                    left_length,
+                    right_length - 1,
+                    public_groups,
+                    public_group_ref)
 
 
     # For round 3 (4 cards with discard) loop once...
@@ -430,8 +713,31 @@ def get_all_runs(hand, round):
             starting_run_group = [starting_card]
             # Safe to pass wilds, it will copy before we remove..
             recurse_until_options_exhausted(starting_run_group, non_wild_cards, wilds, run_length, groups)
-            
-    return groups
+
+    # list of PublicGroup's (Extensions of existing runs)
+    # [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
+    public_groups = []
+
+    # Logically there is no reason to put down a card on an existing set if you have 3 of them.
+    # Only look through adding 1 or 2 cards to an existing set as a result..
+    for existing_run in existing_runs:
+        for left_length in range(0,3):
+            for right_length in range(0,3):
+                if left_length == 0 and right_length == 0:
+                    continue
+        
+                non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards)
+                
+                recurse_existing_run_extensions(
+                    existing_run,
+                    non_wild_cards_copy_copy,
+                    wilds,
+                    left_length,
+                    right_length,
+                    public_groups,
+                    existing_run)
+
+    return groups, public_groups
 
 
 def get_natural_outage_possibilities(round):
@@ -520,12 +826,28 @@ def check_go_out(hand, existing_groups=None):
     round = len(hand.cards) - 1
     hand.sort()
 
-    non_wild_cards = hand.sorted_cards_minus_wilds(round)
-    num_wilds = len(hand.cards) - len(non_wild_cards)
+    existing_sets = []
+    existing_runs = []
+    for existing_group in existing_groups:
+        is_set = is_valid_set(existing_group, round)
+        is_run = is_valid_run(existing_group, round)
+        if is_set and is_run:
+            existing_sets.append(existing_group)
+            continue
+        if is_set:
+            existing_sets.append(existing_group)
+            continue
+        if is_run:
+            existing_runs.append(existing_group)
+            continue
+        raise AssertionError("Exising group is not valid: {}".format(existing_group))
+    
+    logging.debug("Existing sets: {}, Existing runs: {}".format(len(existing_sets), len(existing_runs)))
+
     logging.debug("Getting all runs")
-    runs = get_all_runs(hand, round)
+    runs = get_all_runs(hand, round, existing_runs)
     logging.debug("Getting all sets")
-    sets = get_all_sets(hand, round)
+    sets = get_all_sets(hand, round, existing_sets)
     
     logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
     logging.debug(runs)

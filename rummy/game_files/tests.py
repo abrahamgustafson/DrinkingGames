@@ -1,15 +1,5 @@
 from datastructures import *
 
-def run_tests():
-    test_is_wild()
-    test_is_valid_group()
-    test_get_natural_outage_possibilities()
-    test_get_all_sets()
-    test_get_all_runs()
-    test_check_go_out()
-
-    
-    # test_python()
 
 def test_is_wild():
     
@@ -69,7 +59,7 @@ def test_get_all_sets():
             [Card(Suits.HEART, 2), Card(Suits.HEART, 3), Card(Suits.HEART, 3)],
         ]
 
-    sets = get_all_sets(hand, 3)
+    sets, extended_public_groups = get_all_sets(hand, 3)
     assert sets == expected_sets
 
     # Test no duplicates
@@ -81,7 +71,7 @@ def test_get_all_sets():
 
     expected_sets = []
 
-    sets = get_all_sets(hand, 3)    
+    sets, extended_public_groups = get_all_sets(hand, 3)    
     assert sets == expected_sets
 
     
@@ -97,8 +87,38 @@ def test_get_all_sets():
     hand.add(Card(Suits.HEART, 9))
     expected_sets = [[Card(Suits.HEART, 3), Card(Suits.HEART, 3), Card(Suits.DIAMOND, 3)]]
 
-    sets = get_all_sets(hand, 6)
+    sets, extended_public_groups = get_all_sets(hand, 6)
     assert sets == expected_sets
+
+    # Test playing on public groups when you have nothing.
+    hand = Hand("test")
+    hand.add(Card(Suits.HEART, 7))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.DIAMOND, 11))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.CLUB, 1))
+    hand.add(Card(Suits.CLUB, 1))
+    hand.add(Card(Suits.HEART, 1))
+
+    public_groups = [
+        [Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)],
+        [Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)]
+    ]
+
+    expected_sets = [
+        [Card(Suits.CLUB, 1), Card(Suits.CLUB, 1), Card(Suits.HEART, 1)]]
+
+    sets, extended_public_groups = get_all_sets(hand, 6, public_groups)
+    for g in extended_public_groups:
+        logging.debug(g)
+    
+    assert sets == expected_sets
+    assert len(extended_public_groups) == 5
+    # DEBUG:root:<[[♡7], [♢7], [♢7]]> -> <[[♡7], [♢7], [♢7], [♡7]]>
+    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A]]>
+    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♡A]]>
+    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A], [♣A]]>
+    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A], [♡A]]>
 
 
 def test_get_all_runs():
@@ -113,7 +133,7 @@ def test_get_all_runs():
             [Card(Suits.HEART, 1), Card(Suits.HEART, 2), Card(Suits.HEART, 3)]
         ]    
 
-    sets = get_all_runs(hand, 3)
+    sets, public_groups = get_all_runs(hand, 3)
   
     assert sets == expected_sets
 
@@ -126,7 +146,7 @@ def test_get_all_runs():
 
     expected_sets = []
 
-    sets = get_all_runs(hand, 3)
+    sets, public_groups = get_all_runs(hand, 3)
     assert sets == expected_sets
 
     # Complex case with wilds.
@@ -145,10 +165,107 @@ def test_get_all_runs():
 
     expected_sets = []
 
-    sets = get_all_runs(hand, 9)
+    sets, public_groups = get_all_runs(hand, 9)
     # It works, pain to write...
     # print(sets)
     # assert sets == expected_sets
+
+    # Test playing on public groups when you have nothing.
+    hand = Hand("test")
+    hand.add(Card(Suits.DIAMOND, 6))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.DIAMOND, 11))
+    hand.add(Card(Suits.CLUB, 1))
+
+    public_groups = [
+        [Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 8), Card(Suits.DIAMOND, 9)]
+    ]
+
+    expected_sets = []
+
+    sets, extended_public_groups = get_all_runs(hand, 3, public_groups)
+    assert sets == expected_sets
+    for g in extended_public_groups:
+        logging.debug(g)
+    assert len(extended_public_groups) == 3
+    # Complex to write up. Output now is:
+    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢7], [♢8], [♢9], [♢3], [♢J]]>
+    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9]]>
+    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9], [♢3], [♢J]]>
+
+
+def test_is_valid_run():
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+    ]
+    assert is_valid_run(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.CLUB, 3),
+    ]
+    assert is_valid_run(group, 5)
+
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+    ]
+    assert is_valid_run(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+        Card(Suits.JOKER, 14),
+    ]
+    assert is_valid_run(group, 5)
+
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+    ]
+    assert is_valid_run(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 2),
+        Card(Suits.HEART, 3),
+    ]
+    assert not is_valid_run(group, 5)
+
+
+def test_is_valid_set():
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 1),
+        Card(Suits.HEART, 1),
+    ]
+    assert is_valid_set(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.HEART, 1),
+    ]
+    assert is_valid_set(group, 5)
+    
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+    ]
+    assert is_valid_set(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.HEART, 2),
+    ]
+    assert not is_valid_set(group, 5)
 
 
 def test_get_natural_outage_possibilities():
@@ -341,6 +458,28 @@ def test_check_go_out():
     # assert score == 0
     assert discard == Card(Suits.CLUB, 4)
 
+def test_play_on_other():
+    # Can't go out, but can play cards on another players set to get 0.
+    hand = Hand("test")
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 8))
+    hand.add(Card(Suits.HEART, 9))
+
+    existing_groups = [
+        [Card(Suits.HEART, 8), Card(Suits.CLUB, 8), Card(Suits.CLUB, 8), Card(Suits.DIAMOND, 8)]
+    ]
+
+    score, discard, groups = check_go_out(hand, existing_groups)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 0
+    assert discard == Card(Suits.HEART, 9)
+    assert groups == [[
+        Card(Suits.HEART, 1),
+        Card(Suits.HEART, 2),
+        Card(Suits.HEART, 3)]]
+
 def test_python():
     hand = []
     hand.append(Card(Suits.HEART, 1))
@@ -359,6 +498,18 @@ def test_python():
     group_permutation_order = list(permutations(range(10)))
     logging.debug("total combinations: {}".format(len(group_permutation_order)))
 
+
+def run_tests():
+    test_is_wild()
+    test_is_valid_group()
+    test_get_natural_outage_possibilities()
+    test_get_all_sets()
+    test_get_all_runs()
+    test_is_valid_run()
+    test_is_valid_set()
+    # test_check_go_out()    
+    # test_play_on_other()
+    # test_python()
 
 if __name__ == "__main__":
     

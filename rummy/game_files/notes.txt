@@ -183,3 +183,108 @@ PROBLEM -- Shouldn't be discarding kings
 > INFO:root:[[♣J], [♣J], [♢J]]
 > Abe : <[♢2], [♣2], [♢7], [♠7], [♠9], [♣10], [♢10], [♢J], [♣Q], [ʷW], [ʷW], [ʷW], [ʷW]>
 > Brenna : <[♢A], [♠A], [♢3], [♠4], [♣8], [♠8], [♢8], [♣J], [♢J], [♣J], [ʷW], [ʷW], [ʷW]>
+
+
+# Post fix, checking to make sure things are working
+
+Starting game with players: ['Abe', 'Brenna']
+Round 13 beginning. First player: Abe
+INFO:root:Cards in deck: 108
+Abe : <[♣K], [♢K], [♢9], [♢3], [♠6], [♣5], [♡6], [♢6], [♠2], [♣4], [♣4], [♢10], [♡J]>
+Brenna : <[♣Q], [♡7], [♠3], [♠K], [♡2], [♢8], [♡3], [♣6], [♡8], [♢K], [♠8], [♢4], [♠J]>
+INFO:root:---- Total turn: 1, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♣K], [♢K], [♢9], [♢3], [♠6], [♣5], [♡6], [♢6], [♠2], [♣4], [♣4], [♢10], [♡J], [♣3]>
+INFO:root:Discarding: [♡J]
+INFO:root:---- Total turn: 2, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♣Q], [♡7], [♠3], [♠K], [♡2], [♢8], [♡3], [♣6], [♡8], [♢K], [♠8], [♢4], [♠J], [♡J]>
+INFO:root:Discarding: [♣Q]
+INFO:root:---- Total turn: 3, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠2], [♢3], [♣3], [♣4], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K]>
+INFO:root:Discarding: [♣4]
+INFO:root:---- Total turn: 4, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡2], [♠3], [♡3], [♢4], [♣6], [♡7], [♢8], [♡8], [♠8], [♠J], [♡J], [♠K], [♢K], [♠3]>
+INFO:root:Discarding: [♡7]
+INFO:root:---- Total turn: 5, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠2], [♢3], [♣3], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K], [♡9]>
+INFO:root:Discarding: [♡9]
+INFO:root:---- Total turn: 6, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡2], [♠3], [♡3], [♠3], [♢4], [♣6], [♢8], [♡8], [♠8], [♠J], [♡J], [♠K], [♢K], [♢10]>
+INFO:root:Discarding: [♢10]
+INFO:root:---- Total turn: 7, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠2], [♢3], [♣3], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K], [♠10]>
+INFO:root:Discarding: [♠10]
+INFO:root:---- Total turn: 8, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡2], [♠3], [♡3], [♠3], [♢4], [♣6], [♢8], [♡8], [♠8], [♠J], [♡J], [♠K], [♢K], [♡4]>
+INFO:root:Discarding: [♣6]
+INFO:root:---- Total turn: 9, Players turn: Abe
+INFO:root:Drawing from top of deck
+Abe : <[♠2], [♢3], [♣3], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K], [♣A]>
+INFO:root:Discarding: [♢3]
+INFO:root:---- Total turn: 10, Players turn: Brenna
+INFO:root:Drawing from top of deck
+Brenna : <[♡2], [♠3], [♡3], [♠3], [♢4], [♡4], [♢8], [♡8], [♠8], [♠J], [♡J], [♠K], [♢K], [♠4]>
+INFO:root:Discarding: [♡2]
+INFO:root:Brenna is out! Hand:
+INFO:root:[[♠3], [♠3], [♡3]]
+INFO:root:[[♠4], [♡4], [♢4]]
+INFO:root:[[♠8], [♡8], [♢8]]
+INFO:root:[[♠J], [♡J], [♢K]]
+Abe : <[♣A], [♠2], [♣3], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K]>
+Brenna : <[♠3], [♡3], [♠3], [♢4], [♡4], [♠4], [♢8], [♡8], [♠8], [♠J], [♡J], [♠K], [♢K]>
+
+
+
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 2, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1     
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+ -- This should be looking for 11
+DEBUG:root:LEFT : left: 1, right: 0, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1       
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1       
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 2, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 2, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 1, right: 2, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:LEFT : left: 2, right: 0, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 0, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 0, state: [[♢3], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:LEFT : left: 2, right: 1, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢3], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢3], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢3], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 2, right: 1, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:LEFT : left: 2, right: 2, state: [[♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 2, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 2, state: [[♢6], [♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0    
+DEBUG:root:RIGHT: left: 1, right: 2, state: [[♢6], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0    
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:LEFT : left: 1, right: 2, state: [[♢3], [♢7], [♢8], [♢9]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 0, right: 2, state: [[♢6], [♢3], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 0
+DEBUG:root:RIGHT: left: 1, right: 2, state: [[♢3], [♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 0
+DEBUG:root:RIGHT: left: 2, right: 2, state: [[♢7], [♢8], [♢9]], looking for card: [♢10], exclude_wilds: False, avail_wilds: 1
+DEBUG:root:LEFT : left: 2, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], looking for card: [♢6], exclude_wilds: False, avail_wilds: 0
+DEBUG:root:LEFT : left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢6], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 0, right: 1, state: [[♢6], [♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0    
+DEBUG:root:RIGHT: left: 1, right: 1, state: [[♢6], [♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:RIGHT: left: 2, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], looking for card: [♢10], exclude_wilds: True, avail_wilds: 0
+DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9]]>
+DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢6], [♢7], [♢8], [♢9]]>
+DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢3], [♢7], [♢8], [♢9]]>

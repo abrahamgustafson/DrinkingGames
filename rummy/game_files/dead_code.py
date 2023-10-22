@@ -191,3 +191,54 @@ def check_go_out(hand, existing_groups=None):
     # Card discard strategy, return the highest card with the least combinations
 
     # Add a <play off others> mechanic after.
+
+
+
+    """
+    Need a way to construct sets off of another players runs...
+    # We actually need to look for up to length 4... up to 2 on either side.
+
+    existing = [[2h*,3h*,4h*]]
+    ours = [1h, 5h, 6h]
+    desired_output = [
+        [1h,2h*,3h*,4h*],
+        [2h*,3h*,4h*,5h],
+        [1h,2h*,3h*,4h*,5h],
+        [2h*,3h*,4h*,5h,6h],
+        [1h,2h*,3h*,4h*,5h,6h],
+    ]
+
+    for existing_run in existing_runs:
+        for left_options in range(0,3):
+            for right_options in range(0,3):
+                [0-2][existing_run][0-2]
+
+    
+    Could do some smart assumption below... If you play anything on someone elses run or set,
+    you take it out of play and edit that scenario to be pulbic_group: [1h,2h*,3h*,4h*,5h],
+
+    Options:
+        1) Return a group of [all our runs], [all runs building off existing]
+            - where the latter 
+        2) Return [all_sets], where each set has an indicator for each card saying it's ours or not.
+    """
+
+
+            # If the length on the left or right is == 1, do NOT put a wild on.
+        # There is no point adding a wild to the end of a run.
+
+        # I can't really do recursive here... If I did one card at a time, I would get the scenario:
+            # left 2, right 2
+            # left 1, right 2
+            # left 0, right 2
+            # left 0, right 1
+            # left 0, right 0
+        # Actually that does work. It doesn't need to be recursive though, first selection should be 
+        # sufficient, given that each run I play off is mutually exclusive.
+        # Simply loop through left until 0, and right until 0, adding if we reach zero, or returning if we can't reach it.
+
+        # ONLY PROBLEM is that wilds are not interchangable..
+        # Let's say I pick [1h, W1, 3h*, 4h*, 5h*], I may pick this option in the above strategy,
+        # but that would take W1 out of the rotation for all other combinations.
+        # TODO: I think this is still the best path to go down, but I have to build some interchangable wild check
+        # In the outer loop.
