@@ -211,6 +211,54 @@ class DiscardPile:
     
     def peek(self):
         return self.cards[len(self.cards) - 1]
+    
+
+class Group:
+    cards = None
+    # These cards are not ours.
+    public_group = None
+
+    def __init__(self, public_group=None):
+        """
+        Args:
+            public_group(List(Card)): Existing group to play off which isn't ours.
+                                      EG, [1h,2h,3h]
+        """
+        if not public_group:
+            self.public_group = []
+        else:
+            self.public_group = public_group
+        
+        self.cards = public_group
+    
+    def append(self, card):
+        self.cards.append(card)
+
+
+class PublicGroup:
+    total_group = None
+    fixed_cards = None
+    
+    def __init__(self, total_group, fixed_cards):
+        """
+        ([1h,2h*,3h*,4h*] -> [1h,2h*,3h*,4h*])
+        Args:
+            total_group(list(Card)): List of cards in the group, including addons.
+            fixed_cards(list(Card)): List of cards in the public group, excluding addons.
+        """
+        self.total_group = total_group
+        self.fixed_cards = fixed_cards
+
+    def __str__(self):
+        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+    
+    def __repr__(self):
+        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+    
+    def __eq__(self, other):
+        if isinstance(other, PublicGroup):
+            return self.total_group == other.total_group and self.fixed_cards == other.fixed_cards
+        return False
 
     
 def get_card_score(card, round):
@@ -468,52 +516,6 @@ def get_all_sets(hand, round, existing_sets=None):
                 existing_set)
             
     return groups, public_groups
-
-class Group:
-    cards = None
-    # These cards are not ours.
-    public_group = None
-
-    def __init__(self, public_group=None):
-        """
-        Args:
-            public_group(List(Card)): Existing group to play off which isn't ours.
-                                      EG, [1h,2h,3h]
-        """
-        if not public_group:
-            self.public_group = []
-        else:
-            self.public_group = public_group
-        
-        self.cards = public_group
-    
-    def append(self, card):
-        self.cards.append(card)
-
-class PublicGroup:
-    total_group = None
-    fixed_cards = None
-    
-    def __init__(self, total_group, fixed_cards):
-        """
-        ([1h,2h*,3h*,4h*] -> [1h,2h*,3h*,4h*])
-        Args:
-            total_group(list(Card)): List of cards in the group, including addons.
-            fixed_cards(list(Card)): List of cards in the public group, excluding addons.
-        """
-        self.total_group = total_group
-        self.fixed_cards = fixed_cards
-
-    def __str__(self):
-        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
-    
-    def __repr__(self):
-        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
-    
-    def __eq__(self, other):
-        if isinstance(other, PublicGroup):
-            return self.total_group == other.total_group and self.fixed_cards == other.fixed_cards
-        return False
     
 
 def get_all_runs(hand, round, existing_runs=None):
@@ -522,7 +524,7 @@ def get_all_runs(hand, round, existing_runs=None):
 
     Could return:
         all_my_runs = [[1h,2h,3h],[...]]
-        all_public_runs = [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
+        public_runs = [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
     """
     if not existing_runs:
         existing_runs = []
@@ -756,7 +758,7 @@ def get_natural_outage_possibilities(round):
 
     return find_combinations(round, 3)
 
-def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups):
+def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups, global_loop_count):
     """
     Probably want to evaluate before pushing whether the selected next index works..
     That way the caller can decide to push itself as <end of a tree>
@@ -767,10 +769,12 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
         groups_left(list(idx)): List of indexes left unselected in this path (relative to the groups_reference)
         groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
         truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
+        global_loop_count(list(int)): Incrementing int to see how deep each scenario goes. Used for optimizing.
     """
     # Should it add each time a group doesn't work..? or just if nothing works?
     # If it was [1,2,3,4], and we were at [1] with [2,3,4] left, 
     # at [1]->[2] [3,4] we would at least want to consider the [3,4] as next steps, or each would add [1]..
+    global_loop_count[0] += 1
     viable_next_indexes = []
     for group_idx in groups_left:
         group = groups_reference[group_idx]
@@ -791,20 +795,40 @@ def recursive_scenario_solve(group_order_so_far, remaining_cards, groups_left, g
         if all_cards_work:
             viable_next_indexes.append(group_idx)
             group_order_so_far_copy = copy.deepcopy(group_order_so_far)
-            groups_left_copy = copy.deepcopy(groups_left)
+            # groups_left_copy = copy.deepcopy(groups_left)
             group_order_so_far_copy.append(group_idx)
-            groups_left_copy.remove(group_idx)
+            # groups_left_copy.remove(group_idx)
 
             recursive_scenario_solve(
                 group_order_so_far_copy,
                 remaining_cards_copy,
-                groups_left_copy,
+                # groups_left_copy,
+                groups_left[1:],
                 groups_reference,
-                truncated_groups)
+                truncated_groups,
+                global_loop_count)
     
     # If no scenarios were viable to continue with, this is the end of a tree.
     if not viable_next_indexes:
-        truncated_groups.append(group_order_so_far)
+        if group_order_so_far not in truncated_groups:
+            truncated_groups.append(group_order_so_far)
+        
+        # truncated_groups.append(group_order_so_far)
+
+
+def recursive_scenario_solve_with_public(group_order_so_far, remaining_cards, groups_left, groups_reference, truncated_groups, groups_with_public_cards):
+    """
+    Probably want to evaluate before pushing whether the selected next index works..
+    That way the caller can decide to push itself as <end of a tree>
+    
+    Args:
+        group_order_so_far(list(idx)): List of indexes selected in this path (relative to the groups_reference)
+        remaining_cards(list(Card)): List of cards left in the hand
+        groups_left(list(idx)): List of indexes left unselected in this path (relative to the groups_reference)
+        groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
+        truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
+        public_groups_reference_(list(PublicGroup)): List of all public groups
+    """
     
 
 def check_go_out(hand, existing_groups=None):
@@ -831,28 +855,27 @@ def check_go_out(hand, existing_groups=None):
     for existing_group in existing_groups:
         is_set = is_valid_set(existing_group, round)
         is_run = is_valid_run(existing_group, round)
-        if is_set and is_run:
+        if is_set and is_run or is_run:
             existing_sets.append(existing_group)
             continue
         if is_set:
             existing_sets.append(existing_group)
-            continue
-        if is_run:
-            existing_runs.append(existing_group)
             continue
         raise AssertionError("Exising group is not valid: {}".format(existing_group))
     
     logging.debug("Existing sets: {}, Existing runs: {}".format(len(existing_sets), len(existing_runs)))
 
     logging.debug("Getting all runs")
-    runs = get_all_runs(hand, round, existing_runs)
+    runs, public_runs = get_all_runs(hand, round, existing_runs)
     logging.debug("Getting all sets")
-    sets = get_all_sets(hand, round, existing_sets)
+    sets, public_sets = get_all_sets(hand, round, existing_sets)
     
     logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
-    logging.debug(runs)
-    logging.debug(sets)
+    logging.debug("Public Run options: {}, Public Set options: {}".format(len(public_runs), len(public_sets)))
+    # logging.debug(runs)
+    # logging.debug(sets)
     combined_groups = runs + sets
+    combined_public_groups = public_runs + public_sets
 
     
     # TODO: Get good at python...
@@ -864,6 +887,7 @@ def check_go_out(hand, existing_groups=None):
     truncated_groups = []
 
     # Starter loop, we try each one as the starter..
+    global_loop_count = [0]
     for idx, group in enumerate(combined_groups):
         # Should be impossible to have one of the starter groups not fit. Blind add them.
         group_order_so_far = [idx]
@@ -879,9 +903,66 @@ def check_go_out(hand, existing_groups=None):
         recursive_scenario_solve(
                 group_order_so_far,
                 cards_copy,
-                groups_left,
+                # groups_left,
+                group_indexes[1:],
                 combined_groups,
-                truncated_groups)
+                truncated_groups,
+                global_loop_count)
+        
+    
+    logging.info("Done with recursive_scenario_solve. Total cycles: {}, truncated_groups lenth: {}".format(
+        global_loop_count, len(truncated_groups)))
+        
+    # Output result here is a list of viable orders
+        
+    """
+    Trying to figure out how to do the calculations on public sets and runs:
+
+    1) [ ] Could just throw it straight into the recursive scenario solver
+        - How do I avoid completely nuking the permutations? 
+            1) Use the same heuristic (cutting trees short if they are impossible)
+            2) Save these for the end (but have their orders randomized). N + M versus N * M? 
+    2) [x] Could only calculate if we can't go out naturally...
+        That only helps the best case, and going back through would have to re-do the other 
+        scenario's anyways
+    3) Do two different strategies. One for normal hands, one for going out hands.
+        Normal hands: do what we do now
+        Going out hands: 
+            - go through the nomal loop
+                - If naturally 0 without using <public groups>, return early and play
+                - If not a natural 0, try filling in permutations of public groups in the same recursive pattern
+                    - If naturally 0, return early and play it
+        This will actually still be greedy and potentially suboptimal..
+    """
+    # TODO: Check if there are any 0 point combinations before doing this...
+
+    # TODO: Get good at python...
+    # group_indexes = []
+    # for idx, _ in enumerate(combined_groups):
+    #     group_indexes.append(idx)
+
+    # # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups
+    # truncated_public_groups = []
+
+    # # Starter loop, we try each one as the starter..
+    # for idx, group in enumerate(combined_groups):
+    #     # Should be impossible to have one of the starter groups not fit. Blind add them.
+    #     group_order_so_far = [idx]
+    #     cards_copy = copy.deepcopy(hand.cards)
+
+    #     # Should be impossible to have a group that doesn't work, blindly remove.
+    #     for card in group:
+    #         cards_copy.remove(card)
+        
+    #     groups_left = copy.deepcopy(group_indexes)
+    #     groups_left.remove(idx)
+
+    #     recursive_scenario_solve(
+    #             group_order_so_far,
+    #             cards_copy,
+    #             groups_left,
+    #             combined_groups,
+    #             truncated_groups)
 
     # What I'm left with here: truncated_groups
     # List(list(idx)): List of "groups" where each value in a group is an index ref to combined_groups

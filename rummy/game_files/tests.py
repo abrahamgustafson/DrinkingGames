@@ -1,3 +1,4 @@
+import time
 from datastructures import *
 
 
@@ -507,12 +508,14 @@ def run_tests():
     test_get_all_runs()
     test_is_valid_run()
     test_is_valid_set()
-    # test_check_go_out()    
+    test_check_go_out()    
     # test_play_on_other()
     # test_python()
 
 if __name__ == "__main__":
     
     logging.getLogger().setLevel(logging.DEBUG)
-
+    t0 = time.time()
     run_tests()
+    t1 = time.time()
+    logging.info("Tests ran in {} seconds".format(t1 - t0))

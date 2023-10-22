@@ -288,3 +288,20 @@ DEBUG:root:RIGHT: left: 2, right: 1, state: [[♢7], [♢8], [♢9], [♢3]], lo
 DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9]]>
 DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢6], [♢7], [♢8], [♢9]]>
 DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢3], [♢7], [♢8], [♢9]]>
+
+
+
+DEBUG:root:Getting Starting check_go_out. Run options: 59, Set options: 55
+DEBUG:root:Public Run options: 0, Public Set options: 0
+INFO:root:Done with recursive_scenario_solve. truncated_groups lenth: 739
+DEBUG:root:Test Result: 9, [♡Q], [[[♠7], [ʷW], [♠9]], [[♣10], [ʷW], [♣Q]], [[♢J], [ʷW], [ʷW]]]
+DEBUG:root:Existing sets: 0, Existing runs: 0
+DEBUG:root:Getting all runs
+DEBUG:root:Getting all sets
+DEBUG:root:Getting Starting check_go_out. Run options: 49, Set options: 48
+DEBUG:root:Public Run options: 0, Public Set options: 0
+INFO:root:Done with recursive_scenario_solve. truncated_groups lenth: 2116
+DEBUG:root:Test Result: 2, [♣4], [[[♢3], [♣K], [♢K]], [[♣3], [♣4], [♣5]], [[♢9], [♢10], [♣K]], [[♠6], [♡6], [♢6]]]
+
+Benchmark before trying to reduce copies:
+28s
