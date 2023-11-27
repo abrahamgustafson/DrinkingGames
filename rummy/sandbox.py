@@ -16,12 +16,9 @@ Analysis ideas
 import argparse
 import os
 import csv
-import pandas as pd
-import matplotlib.pyplot as plt; plt.rcdefaults()
-import numpy as np
 import matplotlib.pyplot as plt
-from datetime import datetime
-import itertools
+
+plt.rcdefaults()
 
 
 DEBUG_ENABLED = False
