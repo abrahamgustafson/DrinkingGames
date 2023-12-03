@@ -1,55 +1,9 @@
 import time
 from datastructures import *
 
-
-def test_is_wild():
-    
-    c = Card(Suits.JOKER, 14)
-    assert is_wild(c, 3)
-
-    c = Card(Suits.CLUB, 3)
-    assert is_wild(c, 3)
-
-def test_is_valid_group():
-    cards = []
-    cards.append(Card(Suits.CLUB, 1))
-    cards.append(Card(Suits.CLUB, 2))
-    cards.append(Card(Suits.CLUB, 3))
-    assert is_valid_group(cards, 3)
-    
-    cards = []
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.CLUB, 2))
-    cards.append(Card(Suits.CLUB, 3))
-    assert is_valid_group(cards, 3)
-    
-    cards = []
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.JOKER, 3))
-    assert is_valid_group(cards, 3)
-
-    cards = []
-    cards.append(Card(Suits.HEART, 6))
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.HEART, 8))
-    assert is_valid_group(cards, 3)
-
-    cards = []
-    cards.append(Card(Suits.HEART, 6))
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.CLUB, 8))
-    assert not is_valid_group(cards, 3)
-
-    cards = []
-    cards.append(Card(Suits.HEART, 6))
-    cards.append(Card(Suits.JOKER, 14))
-    cards.append(Card(Suits.CLUB, 6))
-    assert is_valid_group(cards, 3)
-
-def test_get_all_sets():
+def test_get_sets():
     # Test 1 group of duplicates.
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 2))
@@ -60,11 +14,11 @@ def test_get_all_sets():
             [Card(Suits.HEART, 2), Card(Suits.HEART, 3), Card(Suits.HEART, 3)],
         ]
 
-    sets, extended_public_groups = get_all_sets(hand, 3)
+    sets = list(get_sets(hand, 3))
     assert sets == expected_sets
 
     # Test no duplicates
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 4))
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 2))
@@ -72,12 +26,12 @@ def test_get_all_sets():
 
     expected_sets = []
 
-    sets, extended_public_groups = get_all_sets(hand, 3)    
+    sets = list(get_sets(hand, 3))
     assert sets == expected_sets
 
     
     # Test with duplicates of the same card
-    hand = Hand("test")
+    hand = Hand()
 
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 2))
@@ -88,11 +42,235 @@ def test_get_all_sets():
     hand.add(Card(Suits.HEART, 9))
     expected_sets = [[Card(Suits.HEART, 3), Card(Suits.HEART, 3), Card(Suits.DIAMOND, 3)]]
 
-    sets, extended_public_groups = get_all_sets(hand, 6)
+    sets = list(get_sets(hand, 6))
     assert sets == expected_sets
 
+    hand = Hand()
+
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.SPADE, 12))
+    hand.add(Card(Suits.DIAMOND, 13))
+    expected_sets = []
+
+    sets = list(get_sets(hand, 3))
+    assert sets == expected_sets
+
+
+def test_get_runs():
+    # Test 1 run with 1 duplicate
+    hand = Hand()
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 1))
+
+    expected_runs = [
+            [Card(Suits.HEART, 1), Card(Suits.HEART, 2), Card(Suits.HEART, 3)]
+        ]    
+
+    runs = list(get_runs(hand, 3))
+    assert runs == expected_runs
+
+    # Test no runs
+    hand = Hand()
+    hand.add(Card(Suits.HEART, 7))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.CLUB, 1))
+
+    expected_runs = []
+
+    runs = list(get_runs(hand, 3))
+    assert runs == expected_runs
+    hand = Hand()
+
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.SPADE, 12))
+    hand.add(Card(Suits.DIAMOND, 13))
+    expected_runs = []
+
+    runs = list(get_runs(hand, 3))
+    assert runs == expected_runs
+
+def test_get_non_redundant_runs():
+    # Test 1 run with 1 duplicate
+    hand = Hand()
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 3))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 1))
+
+    expected_runs = [
+            [Card(Suits.HEART, 1), Card(Suits.HEART, 2), Card(Suits.HEART, 3)]
+        ]    
+
+    runs = list(get_non_redundant_runs(hand, 3))
+    assert runs == expected_runs
+
+    # Test no runs
+    hand = Hand()
+    hand.add(Card(Suits.HEART, 7))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.CLUB, 1))
+
+    expected_runs = []
+
+    runs = list(get_non_redundant_runs(hand, 3))
+    assert runs == expected_runs
+
+    hand = Hand()
+
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.SPADE, 12))
+    hand.add(Card(Suits.DIAMOND, 13))
+    expected_runs = []
+
+    runs = list(get_non_redundant_runs(hand, 3))
+    assert runs == expected_runs
+
+    hand = Hand()
+
+    hand.add(Card(Suits.DIAMOND, 1))
+    hand.add(Card(Suits.DIAMOND, 4))
+    hand.add(Card(Suits.DIAMOND, 5))
+    hand.add(Card(Suits.DIAMOND, 10))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    expected_runs = []
+
+    runs = list(get_non_redundant_runs(hand, 3))
+    # It works I promise.
+
+def test_get_non_redundant_run_group_extensions():
+    # Test 1 run with 1 duplicate
+    hand = Hand()
+    hand.add(Card(Suits.HEART, 1))
+    hand.add(Card(Suits.HEART, 2))
+    hand.add(Card(Suits.HEART, 8))
+    hand.add(Card(Suits.HEART, 9))
+    hand.add(Card(Suits.CLUB, 9))
+    hand.add(Card(Suits.CLUB, 9))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.HEART, 13))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+
+    group = RunPlay([Card(Suits.HEART, 4), Card(Suits.HEART, 5), Card(Suits.HEART, 6)], 3)
+
+    lower_run_extensions, upper_run_extensions = get_non_redundant_run_group_extensions(hand, 3, group)
+    # It works I promise
+
+def test_is_valid_set():
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 1),
+        Card(Suits.HEART, 1),
+    ]
+    assert SetPlay(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.HEART, 1),
+    ]
+    assert SetPlay(group, 5)
+    
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+    ]
+    assert SetPlay(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.HEART, 2),
+    ]
+
+    exception_thrown = False
+    try:
+        SetPlay(group, 5)
+    except:
+        exception_thrown = True
+    assert exception_thrown
+
+def test_is_valid_run():
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+    ]
+    assert RunPlay(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.CLUB, 3),
+    ]
+    assert RunPlay(group, 5)
+
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+    ]
+    assert RunPlay(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 2),
+        Card(Suits.CLUB, 3),
+        Card(Suits.JOKER, 14),
+    ]
+    assert RunPlay(group, 5)
+
+    group = [
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+    ]
+    assert RunPlay(group, 5)
+
+    group = [
+        Card(Suits.CLUB, 1),
+        Card(Suits.CLUB, 2),
+        Card(Suits.HEART, 3),
+    ]
+
+    exception_thrown = False
+    try:
+        RunPlay(group, 5)
+    except:
+        exception_thrown = True
+    assert exception_thrown
+
+    group = [
+        Card(Suits.HEART, 1),
+        Card(Suits.JOKER, 14),
+        Card(Suits.JOKER, 14),
+        Card(Suits.CLUB, 7)
+    ]
+    assert RunPlay(group, 7)
+
+def test_get_non_wild_set_values_on_groups():
     # Test playing on public groups when you have nothing.
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 7))
     hand.add(Card(Suits.DIAMOND, 3))
     hand.add(Card(Suits.DIAMOND, 11))
@@ -101,105 +279,33 @@ def test_get_all_sets():
     hand.add(Card(Suits.CLUB, 1))
     hand.add(Card(Suits.HEART, 1))
 
-    public_groups = [
-        [Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)],
-        [Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)]
-    ]
-
-    expected_sets = [
-        [Card(Suits.CLUB, 1), Card(Suits.CLUB, 1), Card(Suits.HEART, 1)]]
-
-    sets, extended_public_groups = get_all_sets(hand, 6, public_groups)
-    for g in extended_public_groups:
-        logging.debug(g)
-    
-    assert sets == expected_sets
-    assert len(extended_public_groups) == 5
-    # DEBUG:root:<[[♡7], [♢7], [♢7]]> -> <[[♡7], [♢7], [♢7], [♡7]]>
-    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A]]>
-    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♡A]]>
-    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A], [♣A]]>
-    # DEBUG:root:<[[♡A], [♢A], [♢A]]> -> <[[♡A], [♢A], [♢A], [♣A], [♡A]]>
-
-
-def test_get_all_runs():
-    # Test 1 run with 1 duplicate
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.HEART, 1))
-
-    expected_sets = [
-            [Card(Suits.HEART, 1), Card(Suits.HEART, 2), Card(Suits.HEART, 3)]
-        ]    
-
-    sets, public_groups = get_all_runs(hand, 3)
-  
-    assert sets == expected_sets
-
-    # Test no runs
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 7))
-    hand.add(Card(Suits.DIAMOND, 3))
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.CLUB, 1))
-
-    expected_sets = []
-
-    sets, public_groups = get_all_runs(hand, 3)
-    assert sets == expected_sets
-
-    # Complex case with wilds.
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 4))
-    hand.add(Card(Suits.HEART, 6))
-    hand.add(Card(Suits.HEART, 7))
-    hand.add(Card(Suits.HEART, 8))
-    hand.add(Card(Suits.CLUB, 1))
-    hand.add(Card(Suits.CLUB, 1))
-    hand.add(Card(Suits.CLUB, 1))
-    hand.add(Card(Suits.CLUB, 1))
-    hand.add(Card(Suits.CLUB, 1))
-    hand.add(Card(Suits.CLUB, 9))
-
-    expected_sets = []
-
-    sets, public_groups = get_all_runs(hand, 9)
-    # It works, pain to write...
-    # print(sets)
-    # assert sets == expected_sets
-
-    # Test playing on public groups when you have nothing.
-    hand = Hand("test")
-    hand.add(Card(Suits.DIAMOND, 6))
-    hand.add(Card(Suits.DIAMOND, 3))
-    hand.add(Card(Suits.DIAMOND, 11))
-    hand.add(Card(Suits.CLUB, 1))
+    round = 6
 
     public_groups = [
-        [Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 8), Card(Suits.DIAMOND, 9)]
+        SetPlay([Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)], round),
+        SetPlay([Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)], round)
     ]
 
-    expected_sets = []
+    expected_sets = set([1, 7])
+    sets = get_non_wild_set_values_on_groups(hand, round, public_groups)
 
-    sets, extended_public_groups = get_all_runs(hand, 3, public_groups)
-    assert sets == expected_sets
-    for g in extended_public_groups:
-        logging.debug(g)
-    assert len(extended_public_groups) == 3
-    # Complex to write up. Output now is:
-    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢7], [♢8], [♢9], [♢3], [♢J]]>
-    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9]]>
-    # DEBUG:root:<[[♢7], [♢8], [♢9]]> -> <[[♢6], [♢7], [♢8], [♢9], [♢3], [♢J]]>
+    assert expected_sets == sets
 
-    # Trying to debug run check..
-    # Errored edit: DEBUG:root:Public cards, fixed: [[♢A], [♢2], [♢3], [♢4]].   total: [[♢A], [♢2], [♢3], [♢4], [♡A]]
-    # Round = 10
-    # Public cards: [[[♣5], [♣10], [♣7]], [[♢A], [♢2], [♢3], [♢4]], [[♣K], [♣K], [♢K]]]
-    # Hand: <[♡A], [♠2], [♡4], [♢6], [♢9], [♣10], [♡10], [♣Q], [♠Q], [♢Q], [♣9]>
-    hand = Hand("test")
+def test_get_all_plays():
+    hand = Hand()
+
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.SPADE, 12))
+    hand.add(Card(Suits.DIAMOND, 13))
+    expected_plays = [(hand, [])]
+
+    plays = list(get_all_plays(hand, 3, []))
+    for expected_play, play in zip(expected_plays, plays):
+        assert expected_play[0].cards == play[0].cards
+        assert expected_play[1] == play[1]
+
+    hand = Hand()
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.SPADE, 2))
     hand.add(Card(Suits.HEART, 4))
@@ -213,121 +319,62 @@ def test_get_all_runs():
     hand.add(Card(Suits.CLUB, 9))
     # Public cards: [[[♣5], [♣10], [♣7]], [[♢A], [♢2], [♢3], [♢4]], [[♣K], [♣K], [♢K]]]
     public_groups = [
-        [Card(Suits.CLUB, 5), Card(Suits.CLUB, 10), Card(Suits.CLUB, 7)],
-        [Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 2), Card(Suits.DIAMOND, 3), Card(Suits.DIAMOND, 4)],
-        [Card(Suits.CLUB, 13), Card(Suits.CLUB, 13), Card(Suits.DIAMOND, 13)],
+        RunPlay([Card(Suits.CLUB, 5), FixedCard(Card(Suits.CLUB, 6), Card(Suits.CLUB, 10), 10), Card(Suits.CLUB, 7)], 10),
+        RunPlay([Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 2), Card(Suits.DIAMOND, 3), Card(Suits.DIAMOND, 4)], 10),
+        SetPlay([Card(Suits.CLUB, 13), Card(Suits.CLUB, 13), Card(Suits.DIAMOND, 13)], 10),
     ]
 
-    expected_runs = []
+    # Sort the plays by score, and find the best play.
+    best_play = sorted(list(get_all_plays(hand, 10, public_groups)), key = lambda x: x[0].get_score(10))[0]
+    assert best_play[0].get_score(10) == 7
+    assert not check_go_out(hand, 10, public_groups)
 
-    runs, extended_public_groups = get_all_runs(hand, 10, public_groups)
-    logging.debug("runs: {}\n".format(runs))
-    logging.debug("Public Groups: {}\n".format(extended_public_groups))
-    # assert runs == expected_runs
-    # for g in extended_public_groups:
-    #     logging.debug(g)
-    # assert len(extended_public_groups) == 3
+    hand = Hand()
 
-def test_is_valid_run():
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.CLUB, 2),
-        Card(Suits.CLUB, 3),
-    ]
-    assert is_valid_run(group, 5)
+    hand.add(Card(Suits.CLUB, 6))
+    hand.add(Card(Suits.CLUB, 7))
+    hand.add(Card(Suits.CLUB, 8))
+    hand.add(Card(Suits.JOKER, 14))
+    public_groups = []
+    expected_play = [RunPlay([Card(Suits.CLUB, 6), Card(Suits.CLUB, 7), Card(Suits.CLUB, 8), Card(Suits.JOKER, 14)], 3)]
 
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.JOKER, 14),
-        Card(Suits.CLUB, 3),
-    ]
-    assert is_valid_run(group, 5)
+    best_play = sorted(list(get_all_plays(hand, 3, public_groups)), key = lambda x: x[0].get_score(3))[0]
+    assert best_play[0].get_score(3) == 0
+    assert best_play[1] == expected_play
 
-    group = [
-        Card(Suits.JOKER, 14),
-        Card(Suits.CLUB, 2),
-        Card(Suits.CLUB, 3),
-    ]
-    assert is_valid_run(group, 5)
+def test_optimal_plays():
+    def get_best_play(hand, round, groups):
+        best_play = sorted(list(get_all_plays(hand, round, groups)), key = lambda x: x[0].get_score(round))[0]
+        out_groups = []
+        for play in best_play[1]:
+            play.fix_wilds()
+            play.execute_on(hand, groups)
+            if not isinstance(play, PublicGroupPlay):
+                out_groups.append(play)
+        discard = best_play[0].discard_highest_value(round)
+        return best_play[0].get_score(round), discard, out_groups
 
-    group = [
-        Card(Suits.CLUB, 2),
-        Card(Suits.CLUB, 3),
-        Card(Suits.JOKER, 14),
-    ]
-    assert is_valid_run(group, 5)
-
-    group = [
-        Card(Suits.JOKER, 14),
-        Card(Suits.JOKER, 14),
-        Card(Suits.JOKER, 14),
-    ]
-    assert is_valid_run(group, 5)
-
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.CLUB, 2),
-        Card(Suits.HEART, 3),
-    ]
-    assert not is_valid_run(group, 5)
-
-
-def test_is_valid_set():
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.CLUB, 1),
-        Card(Suits.HEART, 1),
-    ]
-    assert is_valid_set(group, 5)
-
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.JOKER, 14),
-        Card(Suits.HEART, 1),
-    ]
-    assert is_valid_set(group, 5)
-    
-    group = [
-        Card(Suits.JOKER, 14),
-        Card(Suits.JOKER, 14),
-        Card(Suits.JOKER, 14),
-    ]
-    assert is_valid_set(group, 5)
-
-    group = [
-        Card(Suits.CLUB, 1),
-        Card(Suits.JOKER, 14),
-        Card(Suits.HEART, 2),
-    ]
-    assert not is_valid_set(group, 5)
-
-
-def test_get_natural_outage_possibilities():
-    assert get_natural_outage_possibilities(5) == [[5]]
-    assert get_natural_outage_possibilities(6) == [[3, 3], [6]]
-    assert get_natural_outage_possibilities(7) == [[3, 4], [7]]
-    assert get_natural_outage_possibilities(13) == [[3, 3, 3, 4], [3, 3, 7], [3, 4, 6], [3, 5, 5], [3, 10], [4, 4, 5], [4, 9], [5, 8], [6, 7], [13]]
-
-def test_check_go_out():
-    # Simple YES first, with highest card to discard.
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 2))
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    public_groups = []
+    round = 4
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 8
     assert discard == Card(Suits.HEART, 9)
-    assert groups == [[
+    assert groups == [RunPlay([
         Card(Suits.HEART, 1),
         Card(Suits.HEART, 2),
-        Card(Suits.HEART, 3)]]
+        Card(Suits.HEART, 3)], round)]
     
     # Trivial public card group
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 7))
     hand.add(Card(Suits.DIAMOND, 3))
     hand.add(Card(Suits.DIAMOND, 11))
@@ -336,26 +383,24 @@ def test_check_go_out():
     hand.add(Card(Suits.CLUB, 1))
     hand.add(Card(Suits.HEART, 1))
 
-    existing_groups = [
-        [Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)],
-        [Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)]
+    round = 6
+
+    public_groups = [
+        SetPlay([Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7)], round),
+        SetPlay([Card(Suits.HEART, 1), Card(Suits.DIAMOND, 1), Card(Suits.DIAMOND, 1)], round)
     ]
 
-    expected_groups = [
-        [Card(Suits.CLUB, 1), Card(Suits.CLUB, 1), Card(Suits.HEART, 1)]]
+    expected_groups = [SetPlay([Card(Suits.CLUB, 1), Card(Suits.CLUB, 1), Card(Suits.HEART, 1)], round)]
 
-    score, discard, groups, public_groups = check_go_out(hand, existing_groups)
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 13
     assert discard == Card(Suits.DIAMOND, 12)
     assert groups == expected_groups
-    assert len(public_groups) == 1
-    assert public_groups[0].fixed_cards == existing_groups[0]
-    existing_groups[0].append(Card(Suits.HEART, 7))
-    assert existing_groups[0] == public_groups[0].total_group
+    assert public_groups[0] == SetPlay([Card(Suits.HEART, 7), Card(Suits.DIAMOND, 7), Card(Suits.DIAMOND, 7), Card(Suits.HEART, 7)], round)
 
     # Ensure couples take bias over a run if they save points
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 2))
     hand.add(Card(Suits.HEART, 3))
@@ -364,18 +409,19 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 8))
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 11 with group of 3's
+    public_groups = []
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 11
     assert discard == Card(Suits.HEART, 9)
-    assert groups == [[
+    assert groups == [SetPlay([
         Card(Suits.HEART, 3),
         Card(Suits.HEART, 3),
-        Card(Suits.HEART, 3)]]
+        Card(Suits.HEART, 3)], round)]
     
     # Ensure couples take bias over a run if they save points
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 2))
     hand.add(Card(Suits.HEART, 3))
@@ -383,22 +429,23 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 2))
     hand.add(Card(Suits.HEART, 3))
     hand.add(Card(Suits.HEART, 9))
-    # Discard 9, score of 11 with group of 3's
+    # We can go out here.
+    public_groups = []
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    assert score == -15
+    assert score == 0
     assert discard == Card(Suits.HEART, 9)
-    assert groups == [[
+    assert groups == [RunPlay([
         Card(Suits.HEART, 1),
         Card(Suits.HEART, 2),
-        Card(Suits.HEART, 3)],
-        [Card(Suits.HEART, 1),
+        Card(Suits.HEART, 3)], round),
+        RunPlay([Card(Suits.HEART, 1),
         Card(Suits.HEART, 2),
-        Card(Suits.HEART, 3)]]
+        Card(Suits.HEART, 3)], round)]
 
     # Test that math works out for long run taking bias over high couples
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 1))
     hand.add(Card(Suits.HEART, 1))
@@ -408,156 +455,169 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 9))
     # Discard 9, score of 10 with run of 1,2,3
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    public_groups = []
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 10
     assert discard == Card(Suits.HEART, 9)
-    assert groups == [[
+    assert groups == [RunPlay([
         Card(Suits.HEART, 1),
         Card(Suits.HEART, 2),
-        Card(Suits.HEART, 3)]]
+        Card(Suits.HEART, 3)], round)]
 
     # Errored hand: -- Can't go out with anything --
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.CLUB, 1))
     hand.add(Card(Suits.CLUB, 11))
     hand.add(Card(Suits.CLUB, 5))
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    round = 3
+    public_groups = []
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
     assert score == 6
     assert discard == Card(Suits.CLUB, 11)
     assert groups == []
 
     # Errored hand : <[♣6], [ʷW], [♣6], [ʷW]>
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.CLUB, 6))
     hand.add(Card(Suits.JOKER, 14))
     hand.add(Card(Suits.CLUB, 6))
     hand.add(Card(Suits.JOKER, 14))
 
-    score, discard, groups, public_groups = check_go_out(hand)
+    public_groups = []
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
     logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    assert score == -5
-    assert discard == Card(Suits.CLUB, 6)
-    assert groups == [[
-            Card(Suits.CLUB, 6), 
-            Card(Suits.JOKER, 14), 
-            Card(Suits.JOKER, 14), 
-        ]]
+    assert score == 0
+    assert discard == None
+    assert groups == [SetPlay([Card(Suits.CLUB, 6), Card(Suits.CLUB, 6), Card(Suits.CLUB, 6), Card(Suits.CLUB, 6)], round)]
 
     # # Forever hand : <[♢9], [♢5], [♢Q], [ʷW], [ʷW], [♣5]>
-    # hand = Hand("test")
-    # hand.add(Card(Suits.DIAMOND, 9))
-    # hand.add(Card(Suits.DIAMOND, 5))
-    # hand.add(Card(Suits.DIAMOND, 12))
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.CLUB, 5))
+    hand = Hand()
+    hand.add(Card(Suits.DIAMOND, 9))
+    hand.add(Card(Suits.DIAMOND, 5))
+    hand.add(Card(Suits.DIAMOND, 12))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 5))
 
-    # # TODO: Fix this, it is legal, but outputs wrong
-    # score, discard, groups, public_groups = check_go_out(hand)
-    # logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    # assert score == -5
-    # assert discard == Card(Suits.DIAMOND, 12)
-    # assert groups == [[
-    #         Card(Suits.DIAMOND, 9), 
-    #         Card(Suits.JOKER, 14), 
-    #         Card(Suits.JOKER, 14), 
-    #     ]]
+    round = 5
+    public_groups = []
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
+    assert score == 0
+    assert discard == None
+    assert groups == [RunPlay([
+             Card(Suits.DIAMOND, 9), 
+             Card(Suits.DIAMOND, 10), 
+             Card(Suits.DIAMOND, 11), 
+         ], round),
+         RunPlay([
+             Card(Suits.DIAMOND, 10), 
+             Card(Suits.DIAMOND, 11), 
+             Card(Suits.DIAMOND, 12), 
+         ], round)]
     
-    # # Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7], [♣Q]>
-    # # INFO:root:Discarding: [♡K]
-    # hand = Hand("test")
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.CLUB, 10))
-    # hand.add(Card(Suits.SPADE, 9))
-    # hand.add(Card(Suits.SPADE, 13))
-    # hand.add(Card(Suits.DIAMOND, 7))
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.JOKER, 14))
-    # hand.add(Card(Suits.DIAMOND, 11))
-    # hand.add(Card(Suits.DIAMOND, 2))
-    # hand.add(Card(Suits.HEART, 13))
-    # hand.add(Card(Suits.HEART, 12))
-    # hand.add(Card(Suits.SPADE, 7))
-    # hand.add(Card(Suits.CLUB, 12))
+    # Abe : <[ʷW], [♣10], [♠9], [♠K], [♢7], [ʷW], [ʷW], [ʷW], [♢J], [♢2], [♡K], [♡Q], [♠7], [♣Q]>
+    # INFO:root:Discarding: [♡K]
+    hand = Hand()
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.CLUB, 10))
+    hand.add(Card(Suits.SPADE, 9))
+    hand.add(Card(Suits.SPADE, 13))
+    hand.add(Card(Suits.DIAMOND, 7))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.JOKER, 14))
+    hand.add(Card(Suits.DIAMOND, 11))
+    hand.add(Card(Suits.DIAMOND, 2))
+    hand.add(Card(Suits.HEART, 13))
+    hand.add(Card(Suits.HEART, 12))
+    hand.add(Card(Suits.SPADE, 7))
+    hand.add(Card(Suits.CLUB, 12))
 
-    # # TODO: Fix this, it is legal, but outputs wrong
-    # score, discard, groups, public_groups = check_go_out(hand)
-    # logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    # # assert score == 0
-    # assert discard == Card(Suits.HEART, 12)
-    # # assert groups == [[
-    # #         Card(Suits.DIAMOND, 9), 
-    # #         Card(Suits.JOKER, 14), 
-    # #         Card(Suits.JOKER, 14), 
-    # #     ]]
+    round = 13
+    public_groups = []
 
-    # # Discarding 4 seems like a bad choice, 2 seems better..
-    # # Abe : <[♠2], [♢3], [♣3], [♣4], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K]>
-    # # INFO:root:Discarding: [♣4]
-    # hand = Hand("test")
-    # hand.add(Card(Suits.SPADE, 2))
-    # hand.add(Card(Suits.DIAMOND, 3))
-    # hand.add(Card(Suits.CLUB, 3))
-    # hand.add(Card(Suits.CLUB, 4))
-    # hand.add(Card(Suits.CLUB, 4))
-    # hand.add(Card(Suits.CLUB, 5))
-    # hand.add(Card(Suits.SPADE, 6))
-    # hand.add(Card(Suits.HEART, 6))
-    # hand.add(Card(Suits.DIAMOND, 6))
-    # hand.add(Card(Suits.DIAMOND, 9))
-    # hand.add(Card(Suits.DIAMOND, 10))
-    # hand.add(Card(Suits.CLUB, 13))
-    # hand.add(Card(Suits.DIAMOND, 13))
-    # hand.add(Card(Suits.CLUB, 13))
+    score, discard, groups = get_best_play(hand, round, public_groups)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 2
+    assert discard == Card(Suits.SPADE, 9)
+    assert groups == [RunPlay([
+            Card(Suits.DIAMOND, 11), 
+            Card(Suits.DIAMOND, 12), 
+            FixedCard(Card(Suits.DIAMOND, 13), Card(Suits.JOKER, 14), round), 
+        ], round),
+        RunPlay([
+            Card(Suits.CLUB, 10), 
+            Card(Suits.CLUB, 11), 
+            Card(Suits.CLUB, 12), 
+        ], round),
+        RunPlay([
+            Card(Suits.HEART, 10), 
+            Card(Suits.HEART, 11), 
+            Card(Suits.HEART, 12), 
+        ], round),
+        SetPlay([
+            Card(Suits.SPADE, 7), 
+            Card(Suits.DIAMOND, 7), 
+            Card(Suits.CLUB, 7), 
+        ], round)]
 
-    # score, discard, groups, public_groups = check_go_out(hand)
-    # logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    # # assert score == 0
-    # assert discard == Card(Suits.CLUB, 4)
+    # Discarding 4 seems like a bad choice, 2 seems better..
+    # Abe : <[♠2], [♢3], [♣3], [♣4], [♣4], [♣5], [♠6], [♡6], [♢6], [♢9], [♢10], [♣K], [♢K], [♣K]>
+    # INFO:root:Discarding: [♣4]
+    hand = Hand()
+    hand.add(Card(Suits.SPADE, 2))
+    hand.add(Card(Suits.DIAMOND, 3))
+    hand.add(Card(Suits.CLUB, 3))
+    hand.add(Card(Suits.CLUB, 4))
+    hand.add(Card(Suits.CLUB, 4))
+    hand.add(Card(Suits.CLUB, 5))
+    hand.add(Card(Suits.SPADE, 6))
+    hand.add(Card(Suits.HEART, 6))
+    hand.add(Card(Suits.DIAMOND, 6))
+    hand.add(Card(Suits.DIAMOND, 9))
+    hand.add(Card(Suits.DIAMOND, 10))
+    hand.add(Card(Suits.CLUB, 13))
+    hand.add(Card(Suits.DIAMOND, 13))
+    hand.add(Card(Suits.CLUB, 13))
 
+    round = 13
+    public_groups = []
+
+    score, discard, groups = get_best_play(hand, round, public_groups)
+    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
+    assert score == 2
+    assert discard == Card(Suits.CLUB, 4)
+    assert groups == [RunPlay([
+            Card(Suits.DIAMOND, 3), 
+            Card(Suits.DIAMOND, 4), 
+            Card(Suits.DIAMOND, 5), 
+        ], round),
+        RunPlay([
+            Card(Suits.CLUB, 3), 
+            Card(Suits.CLUB, 4), 
+            Card(Suits.CLUB, 5), 
+        ], round),
+        RunPlay([
+            Card(Suits.DIAMOND, 9), 
+            Card(Suits.DIAMOND, 10), 
+            Card(Suits.DIAMOND, 11),
+        ], round),
+        SetPlay([
+            Card(Suits.SPADE, 6), 
+            Card(Suits.HEART, 6), 
+            Card(Suits.DIAMOND, 6), 
+        ], round)]
 
     # Suboptimal case, gave 2 points when it should be 0
-    # Public Groups: [[[♠A], [ʷW], [ʷW]], [[♣3], [♣4], [♣5]], [[♣7], [♣7], [♢7]]]
-    # Hand:  <[♢A], [♠A], [♢A], [♣A], [♡2], [♢2], [♣9], [♢10], [♡10], [♣J], [♠7]>
-    # Should go out with:
-    # [[♢A], [♠A], [♢A]], [[♡2], [♢2], [♢10]], [[♣9], [♡10], [♣J]]
-    # extend [[♣7], [♣7], [♢7]] + [♠7]
-    # Discard [♣A]
-    # Do the sets exist: [[♠A], [♢A], [♢A]], [[♡10], [♡2], [♢2]] Yes
-    # Do the runs exist: [[♣9], [♡10], [♣J]]   Yes
-    # Do the pubset exist:  <[[♣7], [♣7], [♢7]]> -> <[[♣7], [♣7], [♢7], [♠7]]> Yes
-
-    # TODO:  Found a set bug, sets should be sorted! tons of duplicates.
-    # TODO:  Found a set/wild bug. Set here for 2's ONLY includes the [♡10], not [♢10]
-    # TODO:  Found a run/wild bug. Run here for ONLY includes the [♡10], not [♢10]
-    #   -- To do all of these, I should refactor to make a Group subclass that has a sort function..
-    #      have the PublicGroup extend or use that.
-    """
-    Sets: [[[♠A], [♢A], [♢A]], [[♠A], [♡10], [♢A]], [[♡10], [♢A], [♢10]], [[♠A], [♡10], [♢10]], [[♣A], [♠A], [♢A]],
-    [[♣A], [♡10], [♢A]], [[♣A], [♡10], [♢10]], [[♡2],  [♡10], [♢2]], [[♡2], [♡10], [♢10]], [[♡10], [♡2], [♢2]],
-    [[♡10], [♢2], [♢10]], [[♠7], [♡10], [♢10]], [[♣9], [♡10], [♢10]], [[♣J], [♡10], [♢10]], [[♣A], [♠A], [♢A], [♢A]],
-    [[♠A], [♡10], [♢A], [♢A]], [[♠A], [♡10], [♢A], [♢10]], [[♠A], [♡10], [♢10], [♢A]], [[♣A], [♠A], [♡10], [♢A]],
-    [[♣A], [♡10], [♢A], [♢10]], [[♣A], [♡10], [♢10], [♢A]], [[♡2], [♡10], [♢2], [♢10]], [[♡2], [♡10], [♢10], [♢2]],
-    [[♡10], [♡2], [♢2], [♢10]], [[♣A], [♠A], [♡10], [♢A], [♢A]], [[♠A], [♡10], [♢A], [♢A], [♢10]],
-    [[♠A], [♡10], [♢A], [♢10], [♢A]], [[♠A], [♡10], [♢10], [♢A], [♢A]], [[♣A], [♠A], [♡10], [♢A], [♢10]],
-    [[♣A], [♠A], [♡10], [♢10], [♢A]], [[♣A], [♠A], [♡10], [♢A], [♢A], [♢10]], [[♣A], [♠A], [♡10], [♢A], [♢10], [♢A]],
-    [[♣A], [♠A], [♡10], [♢10], [♢A], [♢A]]]
-    Runs: [[[♢A], [♢2], [♡10]], [[♢A], [♡10], [♢10]], [[♠A], [♡10], [♢10]], [[♢A], [♢2], [♡10]], [[♢A], [♡10], [♢10]],
-    [[♣A], [♡10], [♢10]], [[♡2], [♡10], [♢10]], [[♢2], [♡10], [♢10]], [[♠7], [♡10], [♢10]], [[♣9], [♡10], [♣J]]
-    [[♣9], [♡10], [♢10]], [[♣J], [♡10], [♢10]], [[♢A], [♢2], [♡10], [♢10]], [[♢A], [♢2], [♡10], [♢10]], 
-    [[♣9], [♡10], [♣J], [♢10]]]
-    Public Sets: [<[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♢A]]>, <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♠A]]>,
-     <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♣A]]>, <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♠A], [♢A]]>,
-     <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♢A], [♢A]]>, <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♣A], [♢A]]>,
-    <[[♠A], [ʷW], [ʷW]]> -> <[[♠A], [ʷW], [ʷW], [♣A], [♠A]]>, <[[♣7], [♣7], [♢7]]> -> <[[♣7], [♣7], [♢7], [♠7]]>]
-    Public Runs: [<[[♣3], [♣4], [♣5]]> -> <[[♣A], [♡10], [♣3], [♣4], [♣5]]>]
-    """
-    hand = Hand("test")
+    hand = Hand()
     hand.add(Card(Suits.DIAMOND, 1))
     hand.add(Card(Suits.SPADE, 1))
     hand.add(Card(Suits.DIAMOND, 1))
@@ -569,77 +629,44 @@ def test_check_go_out():
     hand.add(Card(Suits.HEART, 10))
     hand.add(Card(Suits.CLUB, 11))
     hand.add(Card(Suits.SPADE, 7))
-    # Public Groups: [[[♠A], [ʷW], [ʷW]], [[♣3], [♣4], [♣5]], [[♣7], [♣7], [♢7]]]
+    # Public Groups: [[[♠A], [♠2], [♠3]], [[♣3], [♣4], [♣5]], [[♣7], [♣7], [♢7]]]
+    round = 10
     public_groups = [
-        [Card(Suits.SPADE, 1), Card(Suits.JOKER, 14), Card(Suits.JOKER, 14)],
-        [Card(Suits.CLUB, 3), Card(Suits.CLUB, 4), Card(Suits.CLUB, 5)],
-        [Card(Suits.CLUB, 7), Card(Suits.CLUB, 7), Card(Suits.DIAMOND, 7)],
+        RunPlay([Card(Suits.SPADE, 1), Card(Suits.SPADE, 2), Card(Suits.SPADE, 3)], round),
+        RunPlay([Card(Suits.CLUB, 3), Card(Suits.CLUB, 4), Card(Suits.CLUB, 5)], round),
+        SetPlay([Card(Suits.CLUB, 7), Card(Suits.CLUB, 7), Card(Suits.DIAMOND, 7)], round),
     ]
-    logging.debug("===========SCENARIO")
-    score, discard, groups, extended_groups = check_go_out(hand, public_groups)
-    logging.debug("Score: {}".format(score))
-    logging.debug("Discard: {}".format(discard))
-    logging.debug("Public Groups: {}".format(public_groups))
-    logging.debug("Extended Public Groups: {}".format(extended_groups))
+    score, discard, groups = get_best_play(hand, round, public_groups)
     assert score == 0
-    # assert runs == expected_runs
-    # for g in extended_public_groups:
-    #     logging.debug(g)
-    # assert len(extended_public_groups) == 3
-
-def test_play_on_other():
-    # Can't go out, but can play cards on another players set to get 0.
-    hand = Hand("test")
-    hand.add(Card(Suits.HEART, 1))
-    hand.add(Card(Suits.HEART, 2))
-    hand.add(Card(Suits.HEART, 3))
-    hand.add(Card(Suits.HEART, 8))
-    hand.add(Card(Suits.HEART, 9))
-
-    existing_groups = [
-        [Card(Suits.HEART, 8), Card(Suits.CLUB, 8), Card(Suits.CLUB, 8), Card(Suits.DIAMOND, 8)]
-    ]
-
-    score, discard, groups = check_go_out(hand, existing_groups)
-    logging.debug("Test Result: {}, {}, {}".format(score, discard, groups))
-    assert score == 0
-    assert discard == Card(Suits.HEART, 9)
-    assert groups == [[
-        Card(Suits.HEART, 1),
-        Card(Suits.HEART, 2),
-        Card(Suits.HEART, 3)]]
-
-def test_python():
-    hand = []
-    hand.append(Card(Suits.HEART, 1))
-    hand.append(Card(Suits.HEART, 13))
-    hand.append(Card(Suits.HEART, 11))
-    hand.append(Card(Suits.HEART, 5))
-    hand.sort()
+    assert discard == None
+    assert groups == [RunPlay([
+            Card(Suits.CLUB, 9), 
+            FixedCard(Card(Suits.CLUB, 10), Card(Suits.JOKER, 14), round),
+            Card(Suits.CLUB, 11), 
+        ], round),
+        SetPlay([
+            Card(Suits.HEART, 2), 
+            Card(Suits.DIAMOND, 2), 
+            Card(Suits.CLUB, 2), 
+        ], round),
+        SetPlay([
+            Card(Suits.CLUB, 1), 
+            Card(Suits.SPADE, 1), 
+            Card(Suits.DIAMOND, 1),
+            Card(Suits.DIAMOND, 1),
+        ], round)]
     
-    # Max permutation set before my computer crashes?
-    # Time is not a good metric, but I don't feel like making another..
-    # 10: ~1s
-    # 11: 6 seconds (with a lot of memory to deallocate after)
-    # 12: __ I crash my computer
-    # 12: 479,001,600, 10: 3,628,800
-    logging.debug("Starting max permutation check")
-    group_permutation_order = list(permutations(range(10)))
-    logging.debug("total combinations: {}".format(len(group_permutation_order)))
-
-
 def run_tests():
-    test_is_wild()
-    test_is_valid_group()
-    test_get_natural_outage_possibilities()
-    test_get_all_sets()
-    test_get_all_runs()
-    test_is_valid_run()
+    test_get_sets()
+    test_get_runs()
+    test_get_non_redundant_runs()
+    test_get_non_redundant_run_group_extensions()
     test_is_valid_set()
-    test_check_go_out()    
-    # test_play_on_other()
-    # test_python()
-
+    test_is_valid_run()
+    test_get_non_wild_set_values_on_groups()
+    test_get_all_plays()
+    test_optimal_plays()
+    
 if __name__ == "__main__":
     
     logging.getLogger().setLevel(logging.DEBUG)

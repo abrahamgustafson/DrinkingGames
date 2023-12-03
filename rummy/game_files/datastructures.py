@@ -4,30 +4,11 @@ import copy
 import logging
 import random
 
-from enum import Enum
+from itertools import groupby, combinations
 from ordered_enum import OrderedEnum
-
-from itertools import permutations
-
+from functools import reduce
 
 logging.basicConfig(level=logging.DEBUG)
-
-CARD_POINT_MAP = {
-    'A': 1,
-    '2': 2,
-    '3': 3,
-    '4': 4,
-    '5': 5,
-    '6': 6,
-    '7': 7,
-    '8': 8,
-    '9': 9,
-    '10': 10,
-    'J': 10,
-    'Q': 10,
-    'K': 10,
-    'W': 0
-}
 
 CARD_TEXT_MAP = {
     1: 'A',
@@ -47,13 +28,15 @@ CARD_TEXT_MAP = {
 }
 
 SUIT_TEXT_MAP = {
-    0: '\u2663',
-    1: '\u2660',
-    2: '\u2661',
-    3: '\u2662',
-    4: '\u02B7'
+    0: '♣',
+    1: '♠',
+    2: '♥',
+    3: '♦',
+    4: 'ʷ'
 }
 
+MIN_SET_LENGTH = 3
+MIN_RUN_LENGTH = 3
 
 class Suits(OrderedEnum):
     CLUB = 0
@@ -66,16 +49,18 @@ class Suits(OrderedEnum):
 class Card:
     suit = None
     value = None
+    is_fixed = None
     # Add visualization
 
     def __init__(self, suit, value):
         """
         Args:
             suit(Suits): suit of card
-            value(int): int number of card (EG, Ace is 1)
+            value(int): int number of card (e.g., Ace is 1)
         """
         self.suit = suit
         self.value = value
+        self.is_fixed = False
 
     def __eq__(self, other):
         if isinstance(other, Card):
@@ -83,23 +68,62 @@ class Card:
         return False
     
     def __lt__(self, other):
-        return self.value < other.value
+        return (self.value, self.suit) < (other.value, other.suit)
     
     def __sub__(self, other):
         return self.value - other.value
     
-    def __str__(self):
-        return "[{}{}]".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value])
-    
     def __repr__(self):
-        return "[{}{}]".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value])
+        return "{}{}".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value])
+    
+    def __hash__(self):
+        return hash(self.suit) + hash(self.value)
     
     def same_suit(self, other):
         return self.suit == other.suit
     
     def same_value(self, other):
         return self.value == other.value
+    
+    def is_wild(self, round):
+        return self.value == round or self.suit == Suits.JOKER or self.value == 14
+    
+    def get_score(self, round):
+        if self.is_wild(round):
+            return 0
+        return min(self.value, 10)
 
+def create_all_card_suits_for_value(value):
+    cards = []
+    for suit in Suits:
+        if suit != Suits.JOKER:
+            cards.append(Card(suit, value))
+    return cards
+
+class FixedCard(Card):
+    wild_card = None
+
+    def __init__(self, fixed_card, wild_card, round):
+        if not wild_card.is_wild(round):
+            raise "Cannot fix value of non-wild card: {} -> {}".format(self, card)
+        if fixed_card.suit == Suits.JOKER:
+            raise "Cannot fix suit of wild card to Joker: {}".format(self)
+        self.value = fixed_card.value
+        self.suit = fixed_card.suit
+        self.is_fixed = True
+        self.wild_card = wild_card
+
+    def __repr__(self):
+        return "{}{}({}{})".format(SUIT_TEXT_MAP[self.suit.value], CARD_TEXT_MAP[self.value], SUIT_TEXT_MAP[self.wild_card.suit.value], CARD_TEXT_MAP[self.wild_card.value])
+
+    def __hash__(self):
+        return hash(self.suit) + hash(self.value) + hash(self.wild_card)
+    
+    def is_wild(self, round):
+        return False
+    
+    def get_score(self, round):
+        return 0
 
 class Deck:
     cards = None
@@ -109,18 +133,20 @@ class Deck:
         for _ in range(0, decks):
             for suit in Suits:
                 if suit == Suits.JOKER:
-                    continue
-                for value in range(1,14):
-                    self.cards.append(Card(suit, value))
-            for _ in range(0, 2):
-                self.cards.append(Card(Suits.JOKER, 14))
+                    for _ in range(2):
+                        self.cards.append(Card(Suits.JOKER, 14))
+                else:
+                    for value in range(1,14):
+                        self.cards.append(Card(suit, value))
         logging.info("Cards in deck: {}".format(len(self.cards)))
 
     def shuffle(self):
         random.shuffle(self.cards)
 
     def deal(self):
-        return self.cards.pop()
+        if self.length():
+            return self.cards.pop()
+        return None
 
     def length(self):
         return len(self.cards)
@@ -128,11 +154,12 @@ class Deck:
 
 class Hand:
     cards = None
-    player_name = None
 
-    def __init__(self, player_name):
-        self.cards = []
-        self.player_name = player_name
+    def __init__(self, cards = None):
+        if cards:
+            self.cards = cards
+        else:
+            self.cards = []
     
     def add(self, card):
         """
@@ -153,45 +180,42 @@ class Hand:
                 return True
         return False
     
-    def __str__(self):
-        s = "{} : ".format(self.player_name)
-        first = True
-        for card in self.cards:
-            if first:
-                s += "<"
-                first = False
-            else:
-                s += ", "
-            s += "{}".format(str(card))
-        s += ">"
-        return s
+    def __repr__(self):
+        return str(self.cards)
+
+    def clear(self):
+        self.cards.clear()
 
     def sort(self):
-        # TODO: Might have to make a secondary sort on the suit... 
-        self.cards.sort(key=lambda x: x.value)
-
-    def sorted_cards_minus_wilds(self, round):
+        self.cards.sort()
+    
+    def get_non_wilds(self, round):
         """
         Return a temporary list of all the cards ignoring wilds.
         """
-        # Should make sure we do insertion sort or something to avoid this.
-        self.sort()
-        cards = []
-        for card in self.cards:
-            if not is_wild(card, round):
-                cards.append(card)
-
-        return cards
+        non_wilds = sorted(list(filter(lambda x: not x.is_wild(round), self.cards)))
+        return non_wilds
     
-    def wilds(self, round):
-        # Should make sure we do insertion sort or something to avoid this.
-        wilds = []
-        for card in self.cards:
-            if is_wild(card, round):
-                wilds.append(card)
-
+    def get_wilds(self, round):
+        """
+        Return a temporary list of all the cards ignoring non-wilds.
+        """
+        wilds = sorted(list(filter(lambda x: x.is_wild(round), self.cards)))
         return wilds
+    
+    def get_score(self, round):
+        return sum(map(lambda x: x.get_score(round), self.cards))
+    
+    def get_highest_value_card(self, round):
+        if self.cards:
+            highest_value = sorted(self.cards, key = lambda x: x.get_score(round))[-1]
+            return highest_value
+        return None
 
+    def discard_highest_value(self, round):
+        highest_value = self.get_highest_value_card(round)
+        self.remove(highest_value)
+        return highest_value
 
 class DiscardPile:
     cards = None
@@ -210,821 +234,510 @@ class DiscardPile:
         return self.cards.pop()
     
     def peek(self):
-        return self.cards[len(self.cards) - 1]
+        if self.cards:
+            return self.cards[-1]
+        return None
+
+class PlayExtension:
+    first_value = None
+    last_value = None
+    suits = None
+    round = None
+
+    def __init__(self, round, suit, first_value, last_value = None):
+        if last_value is not None and last_value <= first_value:
+            raise Exception("Passed in invalid range to PlayExtension: {} -> {}".format(first_value, last_value))
+        self.first_value = first_value
+        self.last_value = last_value if last_value is not None else first_value
+        self.suit = suit
+        self.round = round
     
-
-class Group:
-    cards = None
-    # These cards are not ours.
-    public_group = None
-
-    def __init__(self, public_group=None):
-        """
-        Args:
-            public_group(List(Card)): Existing group to play off which isn't ours.
-                                      EG, [1h,2h,3h]
-        """
-        if not public_group:
-            self.public_group = []
+    def __contains__(self, item):
+        if isinstance(item, Card):
+            if item.is_wild(self.round):
+                return True
+            if self.suit != Suits.JOKER and item.suit != self.suit:
+                return False
+            return self._in(item.value)
         else:
-            self.public_group = public_group
-        
-        self.cards = public_group
-    
-    def append(self, card):
-        self.cards.append(card)
-
-
-class PublicGroup:
-    total_group = None
-    fixed_cards = None
-    private_cards = None
-    
-    def __init__(self, total_group, fixed_cards):
-        """
-        ([1h,2h*,3h*,4h*] -> [1h,2h*,3h*,4h*])
-        Args:
-            total_group(list(Card)): List of cards in the group, including addons.
-            fixed_cards(list(Card)): List of cards in the public group, excluding addons.
-        """
-        self.total_group = total_group
-        self.fixed_cards = fixed_cards
-        self.private_cards = copy.deepcopy(total_group)
-        for card in fixed_cards:
-            self.private_cards.remove(card)
-
-    def __str__(self):
-        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+            return self._in(item)
     
     def __repr__(self):
-        return "<{}> -> <{}>".format(self.fixed_cards, self.total_group)
+        if self.is_single_value():
+            return "Extension {} {}".format(self.first_value, self.suit)
+        else:
+            return "Extension {} {} {}".format(self.first_value, self.last_value, self.suit)
+    
+    def is_single_value(self):
+        return self.last_value != self.first_value
+    
+    def _in(self, value):
+        return value >= self.first_value and value <= self.last_value
+
+class Play:
+    cards = None
+    round = None
+    _extensions = None
+
+    def __init__(self, cards, round):
+        self.cards = cards
+        self.round = round
+        self._extensions = self._calculate_extensions()
+
+    def __repr__(self):
+        return str(self.cards)
     
     def __eq__(self, other):
-        if isinstance(other, PublicGroup):
-            return self.total_group == other.total_group and self.fixed_cards == other.fixed_cards
+        if isinstance(other, self.__class__):
+            return self.cards == other.cards and self.round == other.round
         return False
     
-
+    def get_possible_extensions(self):
+        if not self._extensions:
+            self._extensions = self._calculate_extensions()
+        return self._extensions
     
-def get_card_score(card, round):
-    if is_wild(card, round):
-        return 0
-    return CARD_POINT_MAP[CARD_TEXT_MAP[card.value]]
-    
-
-def is_wild(card, round):
-    """
-    Is a card wild or not
-    """
-    return card.value == 14 or card.value == round or card.suit == Suits.JOKER
-
-
-def is_valid_group(card_list, round):
-    """
-    Check if a grouping of cards is valid to combine together.
-    Assumes cards are sorted (and that wilds are in the slot they need to be)
-
-    Args:
-        card_list(List(Card)): List of cards in a grouping to consider.
-        round(int): Round of cards, aka, which card is wild
-    """
-    if len(card_list) < 3:
-        return False
-    if round < 3 or round > 13:
-        return False
-    
-    last_non_wild = None
-    is_duplicates = True
-    is_run = True
-    running_wild_counter = 0
-
-    for idx, card in enumerate(card_list):
-        if not last_non_wild:
-            if is_wild(card, round):
-                running_wild_counter += 1
-            else:
-                last_non_wild = card
-                running_wild_counter = 0
-            continue
-
-        if is_wild(card, round):
-            running_wild_counter += 1
-            continue
-
-        # If it is card 4 which is a 8*, card 3 was wild, and card 2 was a 6*
-        last_card = card_list[idx - (running_wild_counter + 1)]
-
-        if not card.same_value(last_card):
-            is_duplicates = False
-
-        if not card.same_suit(last_card):
-            is_run = False
+    def add_cards(self, cards, grow_right):
+        if grow_right:
+            self.cards.extend(cards)
         else:
-            if (card - last_card) != (running_wild_counter + 1):
-                is_run = False
+            self.cards = cards + self.cards
+        self._extensions = self._calculate_extensions()
+        if not self._extensions:
+            if grow_right:
+                raise Exception("Added invalid card to play: {} -> {}".format(self.cards, cards))
+            else:
+                raise Exception("Added invalid card to play: {} <- {}".format(cards, self.cards))
+        return True
+            
+    def execute_on(self, hand, public_groups = None):
+        for card in self.cards:
+            if card.is_fixed:
+                hand.remove(card.wild_card)
+            else:
+                hand.remove(card)
+        self.fix_wilds()
+        return self
 
-        if not is_duplicates and not is_run:
+class SetPlay(Play):
+    def __init__(self, cards, round, min_set_length = MIN_SET_LENGTH):
+        super().__init__(cards, round)
+        if len(self.cards) < min_set_length or not self.get_possible_extensions():
+            raise Exception("{} is not a valid set in round {}".format(self.cards, self.round))
+    
+    def can_add_card(self, card, grow_right):
+        if card.is_wild(self.round):
+            return True
+
+        return card in self.get_possible_extensions()
+
+    def fix_wilds(self, fix_value = 1):
+        extension = self.get_possible_extensions()
+        if fix_value in extension:
+            value = fix_value
+        else:
+            value = extension.first_value
+        for i, card in enumerate(self.cards):
+            if card.is_wild(self.round):
+                self.cards[i] = FixedCard(Card(Suits.CLUB, value), card, self.round)
+    
+    def _calculate_extensions(self):
+        filter_cards = list(filter(lambda x: not x.is_wild(self.round), self.cards))
+        if not filter_cards:
+            return PlayExtension(self.round, Suits.JOKER, 1, 13)
+        
+        set_value = reduce(lambda x, y: x if x == y else 0, map(lambda x: x.value, filter_cards), filter_cards[0].value)
+        if set_value:
+            return PlayExtension(self.round, Suits.JOKER, set_value)
+        return None
+
+class RunPlay(Play):
+    def __init__(self, cards, round, min_run_length = MIN_RUN_LENGTH):
+        super().__init__(cards, round)
+        if len(self.cards) < min_run_length or not self.get_possible_extensions():
+            raise Exception("{} is not a valid run in round {}".format(self.cards, self.round))
+    
+    def get_suit(self):
+        return self._get_first_represented_card().suit
+
+    def can_add_card(self, card, grow_right = True):
+        lower_extension, upper_extension = self.get_possible_extensions()
+
+        if grow_right and upper_extension:
+            return card in upper_extension
+        elif not grow_right and lower_extension:
+            return card in lower_extension
+        return False
+
+    def fix_wilds(self, fix_value = 1):
+        lower_extension, upper_extension = self.get_possible_extensions()
+        suit = Suits.CLUB
+        if lower_extension:
+            if fix_value - 1 in lower_extension:
+                first_value = fix_value
+            else:
+                first_value = max(lower_extension.first_value, lower_extension.last_value) + 1
+            if lower_extension.suit != Suits.JOKER:
+                suit = lower_extension.suit
+        elif upper_extension:
+            if fix_value + len(self.cards) in upper_extension:
+                first_value = fix_value
+            elif upper_extension.first_value - len(self.cards) >= 1:
+                first_value = upper_extension.first_value - len(self.cards)
+            else:
+                first_value = upper_extension.last_value - len(self.cards)
+            if upper_extension.suit != Suits.JOKER:
+                suit = upper_extension.suit
+        else:
+            first_value = 1
+            non_wilds = self.cards.get_non_wilds(self.round)
+            if non_wilds:
+                suit = non_wilds[0].suit
+        for i, card in enumerate(self.cards):
+            if card.is_wild(self.round):
+                self.cards[i] = FixedCard(Card(suit, first_value + i), card, self.round)
+
+    def _get_first_represented_card(self):
+        for i, card in enumerate(self.cards):
+            if not card.is_wild(self.round):
+                return Card(card.suit, card.value - i)
+        return Card(Suits.JOKER, 14)
+
+    def _calculate_extensions(self):
+        # Figure out what the first card of the run must be, even if it's actually a wild.
+        first_card = self._get_first_represented_card()
+        if first_card.suit == Suits.JOKER:
+            # All wilds.
+            if (len(self.cards) > 13):
+                # Invalid run.
+                return None
+            elif (len(self.cards) == 13):
+                # Valid, but no extensions.
+                return (None, None)
+            elif (len(self.cards) == 12):
+                # Valid, with one side able to be expanded.
+                if first_card.value == 1:
+                    return (None, PlayExtension(self.round, Suits.JOKER, 13))
+                else:
+                    return (PlayExtension(self.round, Suits.JOKER, 1), None)
+            else:
+                # Valid, with both sides able to be expanded.
+                return (PlayExtension(self.round, Suits.JOKER, 1, 13 - len(self.cards)),
+                        PlayExtension(self.round, Suits.JOKER, len(self.cards) + 1, 13))
+        if first_card.value < 1:
+            # A wild necessarily is representing an illegal value.
+            return None
+        for i, card in enumerate(self.cards):
+            expected_value = first_card.value + i
+            if expected_value > 13 or (not card.is_wild(self.round) and (card.value != expected_value or card.suit != first_card.suit)):
+                return None
+        # This is a valid run. Get the first and last values.
+        return (PlayExtension(self.round, first_card.suit, first_card.value - 1) if first_card.value - 1 >= 1 else None,
+                PlayExtension(self.round, first_card.suit, first_card.value + len(self.cards)) if first_card.value + len(self.cards) <= 13 else None)
+    
+    def select_possible_extensions_from_hand(self, hand):
+        possible_lower_extensions, possible_upper_extensions = set(), set()
+        for card in hand.cards:
+            if self.can_add_card(card, True):
+                possible_upper_extensions.add(card)
+            if self.can_add_card(card, False):
+                possible_lower_extensions.add(card)
+        return possible_lower_extensions, possible_upper_extensions
+
+class PublicGroupPlay(Play):
+    group = None
+    grow_right = False
+
+    def __init__(self, cards, round, group, grow_right):
+        self.group = group
+        self.grow_right = grow_right
+        super().__init__(cards, round)
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.cards == other.cards and self.round == other.round and self.group == other.group and self.grow_right == other.grow_right
+        return False
+    
+    def __repr__(self):
+        if self.grow_right:
+            return "{} <- {}".format(self.group, self.cards)
+        else:
+            return "{} -> {}".format(self.cards, self.group)
+        
+    def can_add_card(self, card, grow_right = True):
+        if grow_right != self.grow_right:
             return False
-
-        # Implicitly not a wild if we hit this path.
-        running_wild_counter = 0
-
-    return True
-
-def is_valid_run(group, round):
-    """
-    Check if this group is a valid run.
-    Assumes the cards are sorted..
-    """
-    last_non_wild_idx = -1
-    for idx, card in enumerate(group):
-        if not is_wild(card, round):
-            if last_non_wild_idx >= 0:
-                last_card = group[last_non_wild_idx]
-                if last_card.suit != card.suit or (last_card.value + idx - last_non_wild_idx) != card.value:
-                    return False
-            last_non_wild_idx = idx
-    return True
-    
-def is_valid_set(group, round):
-    """
-    Check if this group is a valid set.
-    """
-    # If all cards are wild, it technically is a valid run..
-    # [3h, w, 5h]  0, 2
-    last_non_wild_idx = -1
-    for idx, card in enumerate(group):
-        if not is_wild(card, round):
-            if last_non_wild_idx >= 0:
-                last_card = group[last_non_wild_idx]
-                if last_card.value != card.value:
-                    return False
-            last_non_wild_idx = idx
-    return True
-
-def get_all_sets(hand, round, existing_sets=None):
-    """
-    if input is [3,3,4], return []
-    
-    if input is [1,1,1,2,4], return [[1,1,1], [1,1,4]]
-
-    Sets are duplicates of the same card including wilds
-    """
-    if not existing_sets:
-        existing_sets = []
-    
-    groups = []
-    non_wild_cards = hand.sorted_cards_minus_wilds(round)
-    wilds = hand.wilds(round)
-
-    non_wild_cards_copy = copy.deepcopy(non_wild_cards)
-
-    def recurse_until_options_exhausted(ongoing_set, non_wilds, available_wilds, desired_set_len, groups):
-        """
-        Args:
-            ongoing_set(list(Card)): List of cards in the set, (EG, starting would be [4h])
-            non_wilds(list(Card)): Non wild cards, immutable
-            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
-            desired_set_len
-        Return when options exhausted
-        """
-        # Infinite recursion possibility...
-        if len(ongoing_set) == desired_set_len:
-            # TODO: Fix bug some other way? If we have [3h, 3h, 3d], we have 3 duplicate groups.
-            # Really there should be one. (Combination, not permutation). Going to sort and check if it exists
-            # prior to adding..
-            ongoing_set.sort(key=lambda x: x.suit)
-            if ongoing_set not in groups:
-                groups.append(ongoing_set)
-            return
-        
-        # We should never call this with a wild as the starter
-        last_non_wild_card = None
-        for card in reversed(ongoing_set):
-            if not is_wild(card, round):
-                last_non_wild_card = card
-                break
-        if not last_non_wild_card:
-            raise Exception("State invalidation, cannot enter with a list of only wilds")
-        
-        # 6h 0 back means we need any 6.
-        needed_card_value = last_non_wild_card.value
-        found_card = None
-        for card in non_wilds:
-            if card.value == needed_card_value:
-                found_card = card
-                break
-
-        if found_card:
-            # We do have to remove this card from the available cards in this equation...
-            temp_run = copy.deepcopy(ongoing_set)
-            temp_run.append(found_card)
-            non_wilds_copy = copy.deepcopy(non_wilds)
-            non_wilds_copy.remove(found_card)
-            recurse_until_options_exhausted(temp_run, non_wilds_copy, available_wilds, desired_set_len, groups)
-        if len(available_wilds) > 0:
-            temp_run = copy.deepcopy(ongoing_set)
-            temp_available_wilds = copy.deepcopy(available_wilds)
-            # Pop is from the back, but it doesn't matter..
-            temp_run.append(temp_available_wilds.pop())
-            recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_set_len, groups)
-        return
-
-    def recurse_existing_set_extensions(ongoing_set, non_wilds, length, public_groups, public_group_ref):
-        """
-        Args:
-            ongoing_set(list(Card)): List of cards in the run, (EG, starting would be [4h])
-            non_wilds(list(Card)): Non wild cards, immutable
-            desired_run_len
-        Return when options exhausted
-        """
-        
-        # Base case where we add
-        # ASSUMED TO NOT START WITH 0,
-        if length == 0:
-            # I have something wrong here -- given that I can generate the same thing more than once.
-            # For the time being though, just going to ignore it, as long as this function is quick.
-            
-            # Sort the cards we added, just so we don't add duplicates
-            i = len(public_group_ref)
-            j = len(ongoing_set)
-            ongoing_set[i:j] = sorted(ongoing_set[i:j], key=lambda x: x.suit)
-            public_group = PublicGroup(ongoing_set, public_group_ref)
-            if public_group not in public_groups:
-                public_groups.append(PublicGroup(ongoing_set, public_group_ref))
-            return
-            
-        if length > 0:
-            # Don't use wilds, it doesn't make sense
-            first_non_wild = None
-
-            for card in ongoing_set:
-                if not is_wild(card, round):
-                    first_non_wild = card
-                    break
-            
-            if not first_non_wild:
-                raise AssertionError("Should not be possible to have a set of all wilds {}".format(ongoing_set))
-
-            needed_card_number = first_non_wild.value
-            cards_that_work = []
-
-            for card in non_wilds:
-                if card.value == needed_card_number:
-                    cards_that_work.append(card)
-            
-            # logging.debug("length: {}, public_group_ref: {}, ongoing_set: {}, cards_that_work: {}".format(
-            #     length, public_group_ref, ongoing_set, cards_that_work
-            # ))
-            for card in cards_that_work:
-                ongoing_set_copy = copy.deepcopy(ongoing_set)
-                ongoing_set_copy.append(card)
-                non_wilds_copy = copy.deepcopy(non_wilds)
-                non_wilds_copy.remove(card)
-                # Don't actually have to remove the card, because we won't be looking for it again.
-                recurse_existing_set_extensions(
-                    ongoing_set_copy,
-                    non_wilds_copy,
-                    length - 1,
-                    public_groups,
-                    public_group_ref)
-
-
-    # For round 3 (4 cards with discard) loop once...
-    for set_length in range(3, len(hand.cards)):
-        # Use each card as a starter to see if it can make a len 3 run.
-        # Yes, this will include duplicates if we have 2 [3h],
-        # TODO: Could optimize (but think it's okay)
-        for starting_card in non_wild_cards_copy:
-
-            starting_set_group = [starting_card]
-            non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards_copy)
-            non_wild_cards_copy_copy.remove(starting_card)
-            # Safe to pass wilds, it will copy before we remove..
-            recurse_until_options_exhausted(starting_set_group, non_wild_cards_copy_copy, wilds, set_length, groups)
-
-    # list of PublicGroup's (Extensions of existing runs)
-    # [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
-    public_groups = []
-
-    # Logically there is no reason to put down a card on an existing set if you have 3 of them.
-    # Only look through adding 1 or 2 cards to an existing set as a result..
-    for existing_set in existing_sets:
-        for additions in range(1, 3):
-            non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards)
-            
-            recurse_existing_set_extensions(
-                existing_set,
-                non_wild_cards_copy_copy,
-                additions,
-                public_groups,
-                existing_set)
-            
-    return groups, public_groups
-    
-
-def get_all_runs(hand, round, existing_runs=None):
-    """
-    Runs are incrementing values of the same suit (excluding wilds)
-
-    Could return:
-        all_my_runs = [[1h,2h,3h],[...]]
-        public_runs = [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
-    """
-    if not existing_runs:
-        existing_runs = []
-    
-    groups = []
-    non_wild_cards = hand.sorted_cards_minus_wilds(round)
-    wilds = hand.wilds(round)
-
-    non_wild_cards_copy = copy.deepcopy(non_wild_cards)
-
-    def recurse_until_options_exhausted(ongoing_run, non_wilds, available_wilds, desired_run_len, groups):
-        """
-        Args:
-            ongoing_run(list(Card)): List of cards in the run, (EG, starting would be [4h])
-            non_wilds(list(Card)): Non wild cards, immutable
-            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
-            desired_run_len
-        Return when options exhausted
-        """
-        # Infinite recursion possibility...
-        if len(ongoing_run) == desired_run_len:
-            groups.append(ongoing_run)
-            return
-        
-        # We should never call this with a wild as the starter
-        last_non_wild_card = None
-        last_non_wild_cards_back = 0
-        for i, card in enumerate(reversed(ongoing_run)):
-            if not is_wild(card, round):
-                last_non_wild_card = card
-                last_non_wild_cards_back = i
-                break
-        if not last_non_wild_card:
-            raise Exception("State invalidation, cannot enter with a list of only wilds")
-        
-        # 6h 0 back means we need 7h. 6h 1 back means we need 8h.
-        needed_card = Card(last_non_wild_card.suit, last_non_wild_card.value + last_non_wild_cards_back + 1)
-        found_card = False
-        for card in non_wilds:
-            if card == needed_card:
-                found_card = True
-                break
-
-        if found_card:
-            temp_run = copy.deepcopy(ongoing_run)
-            temp_run.append(needed_card)
-            recurse_until_options_exhausted(temp_run, non_wilds, available_wilds, desired_run_len, groups)
-        if len(available_wilds) > 0:
-            temp_run = copy.deepcopy(ongoing_run)
-            temp_available_wilds = copy.deepcopy(available_wilds)
-            # Pop is from the back, but it doesn't matter..
-            temp_run.append(temp_available_wilds.pop())
-            recurse_until_options_exhausted(temp_run, non_wilds, temp_available_wilds, desired_run_len, groups)
-        return
-    
-        # existing_run, non_wild_cards_copy_copy, wilds, left_length, right_length, public_groups
-    def recurse_existing_run_extensions(ongoing_run, non_wilds, available_wilds, left_length, right_length, public_groups, public_group_ref):
-        """
-        Args:
-            ongoing_run(list(Card)): List of cards in the run, (EG, starting would be [4h])
-            non_wilds(list(Card)): Non wild cards, immutable
-            available_wilds(list(Card)): Wilds that are available for use. Copy and pop off if we consume one while recursing
-            desired_run_len
-        Return when options exhausted
-        """
-        
-        # Base case where we add -- IFF left_length == 0 and right_length == 0
-        # ASSUMED TO NOT START WITH 0,0
-        if left_length == 0 and right_length == 0:
-            # I have something wrong here -- given that I can generate the same thing more than once.
-            # For the time being though, just going to ignore it, as long as this function is quick.
-            public_group = PublicGroup(ongoing_run, public_group_ref)
-            if public_group not in public_groups:
-                public_groups.append(PublicGroup(ongoing_run, public_group_ref))
-            return
-            
-        if left_length > 0:
-            # Try to add a card to the left
-
-            # Don't use wilds at the end, it doesn't make sense
-            exclude_wilds = bool(left_length == 1)
-
-            index_of_first_non_wild = -1
-            first_non_wild = None
-
-            for idx, card in enumerate(ongoing_run):
-                if not is_wild(card, round):
-                    index_of_first_non_wild = idx
-                    first_non_wild = card
-                    break
-            
-            if not first_non_wild:
-                raise AssertionError("Should not be possible to have a run of all wilds, those are considered sets. {}".format(ongoing_run))
-
-            needed_card = Card(first_non_wild.suit, first_non_wild.value - (1 + index_of_first_non_wild))
-
-            card_exists = False
-            for card in non_wilds:
-                if card == needed_card:
-                    card_exists = True
-                    break
-            
-            if card_exists:
-                ongoing_run_copy = copy.deepcopy(ongoing_run)
-                ongoing_run_copy.insert(0, needed_card)
-                # Don't actually have to remove the card, because we won't be looking for it again.
-                recurse_existing_run_extensions(
-                    ongoing_run_copy,
-                    non_wilds,
-                    available_wilds,
-                    left_length - 1,
-                    right_length,
-                    public_groups,
-                    public_group_ref)
-
-            if not exclude_wilds and len(available_wilds) > 0:
-                ongoing_run_copy = copy.deepcopy(ongoing_run)
-                temp_available_wilds = copy.deepcopy(available_wilds)
-                ongoing_run_copy.insert(0, temp_available_wilds.pop())
-                recurse_existing_run_extensions(
-                    ongoing_run_copy,
-                    non_wilds,
-                    temp_available_wilds,
-                    left_length - 1,
-                    right_length,
-                    public_groups,
-                    public_group_ref)
-                
-        if right_length > 0:
-            # Try to add a card to the right
-
-            # Don't use wilds at the end, it doesn't make sense
-            exclude_wilds = bool(right_length == 1)
-
-            index_of_first_non_wild = -1
-            first_non_wild = None
-
-            for idx, card in enumerate(reversed(ongoing_run)):
-                if not is_wild(card, round):
-                    index_of_first_non_wild = idx
-                    first_non_wild = card
-                    break
-            
-            if not first_non_wild:
-                raise AssertionError("Should not be possible to have a run of all wilds, those are considered sets. {}".format(ongoing_run))
-
-            needed_card = Card(first_non_wild.suit, first_non_wild.value + (1 + index_of_first_non_wild))
-
-            card_exists = False
-            for card in non_wilds:
-                if card == needed_card:
-                    card_exists = True
-                    break
-            if card_exists:
-                ongoing_run_copy = copy.deepcopy(ongoing_run)
-                ongoing_run_copy.append(needed_card)
-                # Don't actually have to remove the card, because we won't be looking for it again.
-                recurse_existing_run_extensions(
-                    ongoing_run_copy,
-                    non_wilds,
-                    available_wilds,
-                    left_length,
-                    right_length - 1,
-                    public_groups,
-                    public_group_ref)
-
-            if not exclude_wilds and len(available_wilds) > 0:
-                ongoing_run_copy = copy.deepcopy(ongoing_run)
-                temp_available_wilds = copy.deepcopy(available_wilds)
-                ongoing_run_copy.append(temp_available_wilds.pop())
-                recurse_existing_run_extensions(
-                    ongoing_run_copy,
-                    non_wilds,
-                    temp_available_wilds,
-                    left_length,
-                    right_length - 1,
-                    public_groups,
-                    public_group_ref)
-
-
-    # For round 3 (4 cards with discard) loop once...
-    for run_length in range(3, len(hand.cards)):
-        # Use each card as a starter to see if it can make a len 3 run.
-        # Yes, this will include duplicates if we have 2 [3h],
-        # TODO: Could optimize (but think it's okay)
-        for starting_card in non_wild_cards_copy:
-
-            starting_run_group = [starting_card]
-            # Safe to pass wilds, it will copy before we remove..
-            recurse_until_options_exhausted(starting_run_group, non_wild_cards, wilds, run_length, groups)
-
-    # list of PublicGroup's (Extensions of existing runs)
-    # [ ([1h,2h*,3h*,4h*] -> [2h*,3h*,4h*]), ... ]
-    public_groups = []
-
-    # Logically there is no reason to put down a card on an existing set if you have 3 of them.
-    # Only look through adding 1 or 2 cards to an existing set as a result..
-    for existing_run in existing_runs:
-        for left_length in range(0,3):
-            for right_length in range(0,3):
-                if left_length == 0 and right_length == 0:
-                    continue
-        
-                non_wild_cards_copy_copy = copy.deepcopy(non_wild_cards)
-                
-                recurse_existing_run_extensions(
-                    existing_run,
-                    non_wild_cards_copy_copy,
-                    wilds,
-                    left_length,
-                    right_length,
-                    public_groups,
-                    existing_run)
-
-    return groups, public_groups
-
-
-def get_natural_outage_possibilities(round):
-    assert round > 2 and round < 14
-
-    def find_combinations(target, min_group):
-        if target == 0:
-            return [[]]
-        if target < 0:
-            return []
-        combinations = []
-        for i in range(min_group, target + 1):
-            sub_combinations = find_combinations(target - i, i)
-            combinations.extend([[i] + combo for combo in sub_combinations])
-        return combinations
-
-    return find_combinations(round, 3)
-
-def recursive_scenario_solve(
-        group_order_so_far,
-        remaining_cards,
-        groups_left,
-        groups_reference,
-        truncated_groups,
-        global_loop_count,
-        consumed_public_groups = None):
-    """
-    Probably want to evaluate before pushing whether the selected next index works..
-    That way the caller can decide to push itself as <end of a tree>
-    
-    Args:
-        group_order_so_far(list(idx)): List of indexes selected in this path (relative to the groups_reference)
-        remaining_cards(list(Card)): List of cards left in the hand
-        groups_left(list(idx)): List of indexes left unselected in this path (relative to the groups_reference)
-        groups_reference(list(list(Card))): List of all groups (which you can use an idx to lookup)
-        truncated_groups(list(list(idx))): Append the order of selected groups so far when no other group can work.
-        global_loop_count(list(int)): Incrementing int to see how deep each scenario goes. Used for optimizing.
-        consumed_public_groups(list(card)): List of cards that reference a public fixed group. If we play on one,
-                                            we can't play on it twice. That's why we evaluate all public run 
-                                            extensions up front. (EG, set of queens if we have 2 queens).
-    """
-    if not consumed_public_groups:
-        consumed_public_groups = []
-
-    # Should it add each time a group doesn't work..? or just if nothing works?
-    # If it was [1,2,3,4], and we were at [1] with [2,3,4] left, 
-    # at [1]->[2] [3,4] we would at least want to consider the [3,4] as next steps, or each would add [1]..
-    global_loop_count[0] += 1
-    viable_next_indexes = []
-    for group_idx in groups_left:
-        group = groups_reference[group_idx]
-
-        is_public_group = False
-        group_cards = []
-        all_cards_work = True
-
-        # If this group is >= remaining_cards, that means we ignore it. Have to have a discard.
-        if isinstance(group, PublicGroup):
-            group_length = len(group.private_cards)
-            group_cards = group.private_cards
-            is_public_group = True
-            if group.fixed_cards in consumed_public_groups:
-                all_cards_work = False
-        else:
-            group_length = len(group)
-            group_cards = group
-
-        if group_length >= len(remaining_cards):
-            continue
-
-        # Check to see if all cards are possible to remove, if they are, continue with this as viable.
-        remaining_cards_copy = copy.deepcopy(remaining_cards)
-
-        
-        for card in group_cards:
-            if card in remaining_cards_copy:
-                remaining_cards_copy.remove(card)
+        try:
+            if grow_right:
+                self._create_total_group(self.cards + card)
             else:
-                all_cards_work = False
-                break
-        if all_cards_work:
-            consumed_public_groups_copy = copy.deepcopy(consumed_public_groups)
-            if is_public_group:
-                consumed_public_groups_copy.append(group.fixed_cards)
-            viable_next_indexes.append(group_idx)
-            group_order_so_far_copy = copy.deepcopy(group_order_so_far)
-            # groups_left_copy = copy.deepcopy(groups_left)
-            group_order_so_far_copy.append(group_idx)
-            # groups_left_copy.remove(group_idx)
-
-            recursive_scenario_solve(
-                group_order_so_far_copy,
-                remaining_cards_copy,
-                # groups_left_copy,
-                groups_left[1:],
-                groups_reference,
-                truncated_groups,
-                global_loop_count,
-                consumed_public_groups_copy)
-    
-    # If no scenarios were viable to continue with, this is the end of a tree.
-    if not viable_next_indexes:
-        if group_order_so_far not in truncated_groups:
-            truncated_groups.append(group_order_so_far)
+                self._create_total_group(card + self.cards)
+        except:
+            return False
+        return True
         
-        # truncated_groups.append(group_order_so_far)
+    def fix_wilds(self, fix_value = 1):
+        fixed_play = self._create_total_group(self.cards)
+        fixed_play.fix_wilds(fix_value)
 
-def check_go_out(hand, existing_groups=None):
-    """
-    Check if you can go out. 
-    TODO: Need to sort out how I will call this (if you can't go out, what do you discard?)
-
-    Args:
-        hand(Hand): hand with an assumed extra card drawn
-        existing_groups(list): List of existing groups of cards that are out
-    Returns:
-        score(int): Implied to be 0, -5, or -15 based on the existence of existing_groups.
-        discard(Card): popped off the hand
-        card_groups(list(list(Card))): List of card groups we would go out with (if we were going out first)
-        public_card_groups(list(PublicGroup)): List of PublicGroups we modified to go out
-    """
-    if not existing_groups:
-        existing_groups = list()
-    assert len(hand.cards) > 2 and len(hand.cards) < 15
-    round = len(hand.cards) - 1
-    hand.sort()
-
-    existing_sets = []
-    existing_runs = []
-    for existing_group in existing_groups:
-        is_set = is_valid_set(existing_group, round)
-        is_run = is_valid_run(existing_group, round)
-        if is_set and is_run or is_set:
-            existing_sets.append(existing_group)
-            continue
-        if is_run:
-            existing_runs.append(existing_group)
-            continue
-        raise AssertionError("Exising group is not valid: {}".format(existing_group))
-    
-    logging.debug("Existing sets: {}, Existing runs: {}".format(len(existing_sets), len(existing_runs)))
-
-    logging.debug("Getting all runs")
-    runs, public_runs = get_all_runs(hand, round, existing_runs)
-    logging.debug("Getting all sets")
-    sets, public_sets = get_all_sets(hand, round, existing_sets)
-    
-    # logging.debug("Getting Starting check_go_out. Run options: {}, Set options: {}".format(len(runs), len(sets)))
-    # logging.debug("Public Run options: {}, Public Set options: {}".format(len(public_runs), len(public_sets)))
-    # logging.debug("\nSets: {}\nRuns: {}\nPublic Sets: {}\nPublic Runs: {}".format(sets,runs,public_sets,public_runs))
-    groups = runs + sets
-    public_groups = public_runs + public_sets
-    combined_groups = groups + public_groups
-
-    
-    # TODO: Get good at python...
-    combined_group_indexes = []
-    for idx, _ in enumerate(combined_groups):
-        combined_group_indexes.append(idx)
-
-    # List(list(idx)): List of "groups" where each value in a group is an index ref to groups
-    truncated_groups = []
-
-    # Starter loop, we try each one as the starter..
-    global_loop_count = [0]
-    for idx, group in enumerate(combined_groups):
-        # Should be impossible to have one of the starter groups not fit. Blind add them.
-        group_order_so_far = [idx]
-        cards_copy = copy.deepcopy(hand.cards)
-
-        # Should be impossible to have a group that doesn't work, blindly remove.
-        if isinstance(group, PublicGroup):
-            for card in group.private_cards:   
-                cards_copy.remove(card)
+        if self.grow_right:
+            self.cards = fixed_play.cards[-len(self.cards):]
         else:
-            for card in group:
-                cards_copy.remove(card)
-        
-        groups_left = copy.deepcopy(combined_group_indexes)
-        groups_left.remove(idx)
+            self.cards = fixed_play.cards[:len(self.cards)]
 
-        recursive_scenario_solve(
-                group_order_so_far,
-                cards_copy,
-                # groups_left,
-                combined_group_indexes[1:],
-                combined_groups,
-                truncated_groups,
-                global_loop_count)
-        
-    logging.debug("Done with recursive_scenario_solve. Total cycles: {}, truncated_groups lenth: {}".format(
-        global_loop_count, len(truncated_groups)))
-        
-    # Output result here is a list of viable orders
-
-
-    # list(tuple(scenario_selection_group, discard, other_cards, score))
-    outage_scenarios = []
-    first_to_go_out = len(existing_groups) == 0
-
-    # Loop through each, select a discard, and calculate a score
-    # truncated_groups = list(list(group_indexes)) // group indexes in a scenario that reached the end.
-    for truncated_group in truncated_groups:
-        private_card_groups = []
-        public_card_groups = []
-
-        for group_index in truncated_group:
-            group = combined_groups[group_index]
-            if isinstance(group, PublicGroup):
-                public_card_groups.append(group)
+    def execute_on(self, hand, public_groups):
+        if self.group not in public_groups:
+            print("{} not in {}".format(self.group, public_groups))
+        public_group = next(x for x in public_groups if x == self.group)
+        public_group.add_cards(self.cards, self.grow_right)
+        for card in self.cards:
+            if card.is_fixed:
+                hand.remove(card.wild_card)
             else:
-                private_card_groups.append(group)
+                hand.remove(card)
+        public_group.fix_wilds()
+        return public_group
+
+    def _create_total_group(self, cards):
+        if self.grow_right:
+            total_group = self.group.cards + cards
+        else:
+            total_group = cards + self.group.cards
+        try:
+            return SetPlay(total_group, self.round)
+        except:
+            try:
+                return RunPlay(total_group, self.round)
+            except:
+                raise Exception("{} is not a valid play in round {}".format(cards, self.round))
+    
+    def _calculate_extensions(self):
+        return self._create_total_group(self.cards).get_possible_extensions()
+
+def get_runs(cards, round, starting_run = None, grow_right = True):
+    if starting_run is None:
+        starting_run = []
+
+    def remove_card(to_remove):
+        cards_copy = copy.deepcopy(cards)
+        cards_copy.cards.remove(to_remove)
+        return cards_copy
+
+    if len(starting_run) >= MIN_RUN_LENGTH:
+        yield starting_run
+    
+    lower_extension_cards, upper_extension_cards = RunPlay(starting_run, round, 0).select_possible_extensions_from_hand(cards)
+    if grow_right:
+        for card in upper_extension_cards:
+            yield from get_runs(remove_card(card), round, starting_run + [card], grow_right)
+    else:
+        for card in lower_extension_cards:
+            yield from get_runs(remove_card(card), round, [card] + starting_run, grow_right)
+
+def _expand_sorted_non_wild_run_with_wilds(potential_run, wild_cards, round, minimum_run_length = MIN_RUN_LENGTH):
+    if not potential_run:
+        return None
+    span = potential_run[-1].value - potential_run[0].value + 1
+    critical_wild_count = max(span, minimum_run_length) - len(potential_run)
+
+    if critical_wild_count > len(wild_cards):
+        return None
+    
+    wild_copy = copy.deepcopy(wild_cards)
+    def take_n_wilds(n):
+        if n <= 0:
+            return None
+        n_wilds = wild_copy[-n:]
+        del wild_copy[-n:]
+        return n_wilds
+
+    # Insert the required internal wilds.
+    k = 1
+    while k < len(potential_run):
+        gap = (potential_run[k].value - potential_run[k - 1].value - 1)
         
-        cards_copy = copy.deepcopy(hand.cards)
-        for group in private_card_groups:
-            for card in group:
-                cards_copy.remove(card)
-        for group in public_card_groups:
-            for card in group.private_cards:
-                cards_copy.remove(card)
-        
-        
-        assert len(cards_copy) >= 1
-        cards_copy.sort(key=lambda x: get_card_score(x, round))
-        discard = cards_copy[len(cards_copy) - 1]
-        
-        # State invalidation.
-        # It's viable to discard a wild IFF you are going out
-        # if len(cards_copy) > 1:
-        #     assert not is_wild(discard, round)        
-        cards_copy.remove(discard)
+        if gap < 0:
+            raise Exception("Passed in run isn't sorted: {}".format(potential_run))
+        elif gap:
+            potential_run = potential_run[:k] + take_n_wilds(gap) + potential_run[k:]
+        k += gap + 1
 
-        scenario_score = 0
-        for card in cards_copy:
-            scenario_score += get_card_score(card, round)
+    # Insert the required external wilds.
+    # Keep track of first and last non-wild index for bookkeeping purposes.
+    external_wild_count = max(minimum_run_length - len(potential_run), 0)
+    first_non_wild, last_non_wild = 0, len(potential_run)
+    if external_wild_count:
+        # Try and insert the whole pack either in the front or in the back.
+        # Since we have a small MIN_RUN_LENGTH, this algorithm is fast and
+        # works well enough. If it were larger, we would need to be more
+        # careful.
+        if (potential_run[-1].value <= 13 - external_wild_count):
+            potential_run.extend(take_n_wilds(external_wild_count))
+        elif (potential_run[0].value >= external_wild_count + 1):
+            potential_run = take_n_wilds(external_wild_count) + potential_run
+            first_non_wild += external_wild_count
+            last_non_wild += external_wild_count
+        else:
+            # We should never hit this.
+            return None
 
-        if first_to_go_out and scenario_score == 0:
-            # First to go out gets -5
-            scenario_score -= 5
-            if len(hand.wilds(round)) == 0:
-                # If you go out first naturally, you get an additional -10
-                scenario_score -= 10
+    # Now we have some non-critical wilds that we can replace elements of the list with.
+    # Only internal elements should ever be replaced; replacing wilds is redundant.
+    # We should end up with (span - 2) choose (extra_wild_count) runs from this.
+    # First, get the indices of all internal elements that can be replaced.
+    internal_non_wild_indices = []
+    for k in range(first_non_wild + 1, last_non_wild - 1):
+        if not potential_run[k].is_wild(round):
+            internal_non_wild_indices.append(k)
+    for wilds in range(len(wild_copy) + 1):
+        for g in combinations(internal_non_wild_indices, wilds):
+            output_run = copy.deepcopy(potential_run)
+            for wild_idx, idx in enumerate(g):
+                output_run[idx] = copy.deepcopy(wild_copy[wild_idx])
+            yield output_run
 
-        outage_scenarios.append((private_card_groups, discard, cards_copy, scenario_score, public_card_groups))
+def get_non_redundant_runs(cards, round):
+    non_wild_cards = sorted(list(set(cards.get_non_wilds(round))))
+    wild_cards = cards.get_wilds(round)
 
-    # If there are no outage scenarios, we have jack shit... Make one with no groups
-    if len(outage_scenarios) == 0:
-        card_groups = []
-        cards_copy = copy.deepcopy(hand.cards)
-        assert len(cards_copy) >= 1
-        cards_copy.sort(key=lambda x: CARD_POINT_MAP[CARD_TEXT_MAP[x.value]])
-        discard = cards_copy[len(cards_copy) - 1]
-        
-        # State invalidation.
-        # It's viable to discard a wild IFF you are going out
-        if len(cards_copy) > 1:
-            assert not is_wild(discard, round)
-        
-        cards_copy.remove(discard)
+    suit_groups = groupby(non_wild_cards, lambda x: x.suit)
+    for _, non_wild_suited in suit_groups:
+        non_wild_suited = sorted(list(non_wild_suited))
+        for i in range(len(non_wild_suited)):
+            for j in range(i, len(non_wild_suited)):
+                yield from _expand_sorted_non_wild_run_with_wilds(non_wild_suited[i:j+1], wild_cards, round)
 
-        scenario_score = 0
-        for card in cards_copy:
-            scenario_score += get_card_score(card, round)
+def get_non_redundant_run_group_extensions(cards, round, group):
+    lower_extension, upper_extension = group.get_possible_extensions()
+    group_suit = group.get_suit()
+    non_wild_cards = sorted(list(filter(lambda x: x.suit == group_suit, set(cards.get_non_wilds(round)))))
+    wild_cards = cards.get_wilds(round)
+    
+    possible_upper_extensions = []
+    possible_lower_extensions = []
+    if upper_extension:
+        for top_value in range(upper_extension.first_value - 1, upper_extension.last_value):
+            non_wild_set = list(filter(lambda x: x.value > top_value, non_wild_cards))
+            for i in range(1, len(non_wild_set) + 1):
+                for possible_extension in _expand_sorted_non_wild_run_with_wilds([Card(group_suit, top_value)] + non_wild_set[:i], wild_cards, round, 2):
+                    possible_upper_extensions.append(possible_extension[1:])
+    if lower_extension:
+        for bottom_value in range(lower_extension.first_value + 1, lower_extension.last_value + 2):
+            non_wild_set = list(filter(lambda x: x.value < bottom_value, non_wild_cards))
+            for i in range(0, len(non_wild_set)):
+                for possible_extension in _expand_sorted_non_wild_run_with_wilds(non_wild_set[i:] + [Card(group_suit, bottom_value)], wild_cards, round, 2):
+                    possible_lower_extensions.append(possible_extension[:-1])
+    
+    return possible_lower_extensions, possible_upper_extensions
 
-        outage_scenarios.append((card_groups, discard, cards_copy, scenario_score, []))
+def get_sets(cards, round, only_maximum_size = False):
+    non_wild_cards = cards.get_non_wilds(round)
+    wild_cards = cards.get_wilds(round)
 
-    # Sort by the lowest value...
-    outage_scenarios.sort(key = lambda x: x[3]) 
+    # Differentiating between wilds is meaningless, so we will not.
+    # Return sets that can be made with all wilds.
+    if len(wild_cards) >= MIN_SET_LENGTH:
+        start_bound = len(wild_cards) if only_maximum_size else MIN_SET_LENGTH
+        for i in range(start_bound, len(wild_cards) + 1):
+            yield wild_cards[:i]
 
-    # Greedy strategy, just discard the highest card that isn't in a run.
-    chosen_scenario = outage_scenarios[0]
-    hand.remove(chosen_scenario[1])
+    # Return all sets with at least one real card.
+    possible_sets = groupby(non_wild_cards, lambda x: x.value)
+    for _, group in possible_sets:
+        possible_set = list(group)
+        if only_maximum_size and (len(possible_set) + len(wild_cards) >= MIN_SET_LENGTH):
+            yield possible_set + wild_cards
+        else:
+            for card_count in range(1, len(possible_set) + 1):
+                for wild_count in range(max(MIN_SET_LENGTH - card_count, 0), len(wild_cards) + 1):
+                    yield possible_set[0:card_count] + wild_cards[:wild_count]
 
-    return chosen_scenario[3], chosen_scenario[1], chosen_scenario[0], chosen_scenario[4]
+def get_non_wild_set_values_on_groups(cards, round, groups):
+    set_groups = filter(lambda x: isinstance(x, SetPlay), groups)
+    all_possible_sets = set([x.get_possible_extensions().first_value for x in set_groups])
+    non_wild_cards = set(map(lambda x: x.value, cards.get_non_wilds(round)))
+    return non_wild_cards.intersection(all_possible_sets)
 
-    # Card discard strategy, return the highest card with the least combinations
+def get_all_plays(cards, round, public_groups, line = None):
+    if line is None:
+        line = []
 
-    # Add a <play off others> mechanic after.
-    """
-    Just take sets / runs from the table, find some way to mark them as "not mine"
-    put them into the sets function and runs function. Then when subtracting,
-    just don't subtract those cards from my hand.
-    """
+    def remove_cards(to_remove):
+        cards_copy = copy.deepcopy(cards)
+        for card in to_remove:
+            cards_copy.cards.remove(card)
+        return cards_copy
+
+    def add_to_group(cards, target_group, grow_right):
+        groups_copy = copy.deepcopy(public_groups)
+        for group in groups_copy:
+            if target_group == group:
+                group.add_cards(cards, grow_right)
+                group.fix_wilds()
+                return groups_copy
+        raise Exception("Failed to add card to group!")
+    
+    def add_to_line(play):
+        line_copy = copy.deepcopy(line)
+        line_copy.append(play)
+        return line_copy
+    
+    # We can't be greedy here.
+    for run in get_non_redundant_runs(cards, round):
+        yield from get_all_plays(remove_cards(run), round, public_groups, add_to_line(RunPlay(run, round)))
+
+    run_groups = list(filter(lambda x: isinstance(x, RunPlay), public_groups))
+    if (run_groups):
+        # Check all subplays on group runs first.
+        # We can't be greedy here either.
+        for group in run_groups:
+            lower_extensions, upper_extensions = get_non_redundant_run_group_extensions(cards, round, group)
+
+            for extension in lower_extensions:
+                yield from get_all_plays(remove_cards(extension), round, add_to_group(extension, group, False), add_to_line(PublicGroupPlay(extension, round, group, False)))
+            for extension in upper_extensions:
+                yield from get_all_plays(remove_cards(extension), round, add_to_group(extension, group, True), add_to_line(PublicGroupPlay(extension, round, group, True)))
+
+    # We can be greedy here.
+    for set in get_sets(cards, round, True):
+        yield from get_all_plays(remove_cards(set), round, public_groups, add_to_line(SetPlay(set, round)))
+
+    # At this point, we can play out any cards we have, including wilds, onto public groups.
+    # We can continue to be greedy here.
+    remaining_cards = copy.deepcopy(cards)
+
+    # Try and play on existing sets.
+    set_groups = list(filter(lambda x: isinstance(x, SetPlay), public_groups))
+    wilds = cards.get_wilds(round)
+    if set_groups:
+        for value in get_non_wild_set_values_on_groups(cards, round, set_groups):
+           group = next(filter(lambda x: x.cards[0].value == value, set_groups))
+           cards_to_play = list(filter(lambda x: x.value == value, cards.get_non_wilds(round)))
+           line.append(PublicGroupPlay(cards_to_play, round, group, True))
+           for card in cards_to_play:
+               remaining_cards.remove(card)
+
+    # We may have wilds left over at the end. We've already tried wilds against
+    # all of our sets, but they can be played against any run we've made.
+    # Greedily add them to any run we can.
+    def add_wild_to_plays(wild):
+        if not wild:
+            return False
+        for play in filter(lambda x: isinstance(x, RunPlay) or isinstance(x, PublicGroupPlay), line):
+            for right in [True, False]:
+                if play.can_add_card(wild, right):
+                    remaining_cards.remove(wild)
+                    play.add_cards([wild], right)
+                    return True
+        return False
+
+
+    while wilds:
+        if not add_wild_to_plays(wilds.pop()):
+            break
+
+    yield remaining_cards, line
+
+def check_go_out(hand, round, groups):
+    best_play = sorted(list(get_all_plays(hand, round, groups)), key = lambda x: x[0].get_score(round))[0]
+    return best_play[0] == 0
